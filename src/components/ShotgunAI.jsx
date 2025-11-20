@@ -3,7 +3,7 @@ import { X, Trophy, Zap, Car, Users, TrendingUp, Award, Star, Flame } from 'luci
 
 const ShotgunAI = () => {
   // View management
-  const [currentView, setCurrentView] = useState('boot');
+  const [currentView, setCurrentView] = useState('boot'); // UPDATED VERSION 2.0
 
   // Member state
   const [members, setMembers] = useState([]);
@@ -296,10 +296,13 @@ const ShotgunAI = () => {
           <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
             <div className="glass-card max-w-lg w-full rounded-2xl p-12 text-center slide-up">
               <div className="float-animation mb-8">
-                <div className="text-8xl mb-6">🚀</div>
+                <div className="text-8xl mb-6">🚀 NEW VERSION 🚀</div>
                 <h1 className="text-6xl font-black heading-font bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 bg-clip-text text-transparent mb-4">
-                  SHOTGUN.AI
+                  SHOTGUN.AI v2.0
                 </h1>
+                <div style={{backgroundColor: 'red', color: 'white', padding: '20px', fontSize: '24px', fontWeight: 'bold'}}>
+                  ⚠️ IF YOU SEE THIS, THE NEW VERSION IS LOADED! ⚠️
+                </div>
                 <p className="text-purple-300 text-sm tracking-widest">CARPOOL COMMAND CENTER</p>
               </div>
 
