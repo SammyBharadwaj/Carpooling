@@ -194,14 +194,23 @@ const ShotgunAI = () => {
     // If there's a current group, load from that group's data
     if (savedGroupName) {
       const groupData = localStorage.getItem(`shotgunGroup_${savedGroupName}`);
+      console.log('🔍 Looking for group:', savedGroupName, 'Found:', !!groupData);
       if (groupData) {
         const parsed = JSON.parse(groupData);
+        console.log('📂 Loaded group data:', savedGroupName, {
+          membersCount: parsed.members?.length || 0,
+          tripsCount: parsed.trips?.length || 0,
+          memberNames: parsed.members?.map(m => m.name) || [],
+          membersData: parsed.members || []
+        });
         setMembers(parsed.members || []);
         setTrips(parsed.trips || []);
         setDefaultCity(parsed.defaultCity || null);
         setAchievements(parsed.achievements || []);
         setGroupName(savedGroupName);
         return; // Don't load from generic localStorage
+      } else {
+        console.log('⚠️ Group data not found for:', savedGroupName);
       }
     }
 
@@ -211,7 +220,11 @@ const ShotgunAI = () => {
     const savedCity = localStorage.getItem('shotgunCity');
     const savedAchievements = localStorage.getItem('shotgunAchievements');
 
-    if (savedMembers) setMembers(JSON.parse(savedMembers));
+    if (savedMembers) {
+      const members = JSON.parse(savedMembers);
+      setMembers(members);
+      console.log('📂 Loaded generic data:', { membersCount: members.length, membersWithPoints: members.filter(m => m.points > 0).length });
+    }
     if (savedTrips) setTrips(JSON.parse(savedTrips));
     if (savedCity) setDefaultCity(JSON.parse(savedCity));
     if (savedAchievements) setAchievements(JSON.parse(savedAchievements));
@@ -219,7 +232,20 @@ const ShotgunAI = () => {
 
   // Save to localStorage whenever data changes
   useEffect(() => {
+    // Skip saving on initial mount (empty data)
+    if (members.length === 0 && trips.length === 0 && !defaultCity) {
+      console.log('⏭️ Skipping save - no data yet');
+      return;
+    }
+
+    // Save to generic localStorage (for backward compatibility and auto-save)
     localStorage.setItem('shotgunMembers', JSON.stringify(members));
+    localStorage.setItem('shotgunTrips', JSON.stringify(trips));
+    localStorage.setItem('shotgunAchievements', JSON.stringify(achievements));
+    if (defaultCity) {
+      localStorage.setItem('shotgunCity', JSON.stringify(defaultCity));
+    }
+
     // Also update the current group if one is loaded
     if (groupName) {
       const groupData = {
@@ -231,22 +257,37 @@ const ShotgunAI = () => {
         timestamp: new Date().toISOString()
       };
       localStorage.setItem(`shotgunGroup_${groupName}`, JSON.stringify(groupData));
+      console.log('💾 Saved group data:', groupName, {
+        membersCount: members.length,
+        tripsCount: trips.length,
+        memberNames: members.map(m => m.name),
+        membersWithPoints: members.filter(m => m.points > 0).map(m => ({ name: m.name, points: m.points }))
+      });
+    } else {
+      console.log('💾 Saved generic data:', {
+        membersCount: members.length,
+        tripsCount: trips.length,
+        memberNames: members.map(m => m.name)
+      });
     }
-  }, [members, groupName, trips, defaultCity, achievements]);
+  }, [members, trips, defaultCity, achievements, groupName]);
 
+  // Auto-dismiss achievements after 5 seconds
   useEffect(() => {
-    localStorage.setItem('shotgunTrips', JSON.stringify(trips));
-  }, [trips]);
+    const undismissedAchievements = achievements.filter(a => !dismissedAchievements.includes(a.id));
 
-  useEffect(() => {
-    if (defaultCity) {
-      localStorage.setItem('shotgunCity', JSON.stringify(defaultCity));
+    if (undismissedAchievements.length > 0) {
+      const timers = undismissedAchievements.map(achievement =>
+        setTimeout(() => {
+          setDismissedAchievements(prev => [...prev, achievement.id]);
+        }, 5000)
+      );
+
+      return () => {
+        timers.forEach(timer => clearTimeout(timer));
+      };
     }
-  }, [defaultCity]);
-
-  useEffect(() => {
-    localStorage.setItem('shotgunAchievements', JSON.stringify(achievements));
-  }, [achievements]);
+  }, [achievements, dismissedAchievements]);
 
   // Calculate route when from/to addresses change
   useEffect(() => {
@@ -395,11 +436,17 @@ const ShotgunAI = () => {
   // Load a saved group
   const loadGroup = (name) => {
     const groupData = localStorage.getItem(`shotgunGroup_${name}`);
-    console.log('Loading group:', name, groupData);
+    console.log('🔄 Loading group:', name, 'Data exists:', !!groupData);
 
     if (groupData) {
       const parsed = JSON.parse(groupData);
-      console.log('Parsed group data:', parsed);
+      console.log('📂 Parsed group data:', {
+        name: parsed.name,
+        membersCount: parsed.members?.length || 0,
+        tripsCount: parsed.trips?.length || 0,
+        memberNames: parsed.members?.map(m => m.name) || [],
+        fullMembersData: parsed.members
+      });
 
       setMembers(parsed.members || []);
       setTrips(parsed.trips || []);
@@ -417,7 +464,7 @@ const ShotgunAI = () => {
       // Automatically go to dashboard
       setCurrentView('dashboard');
     } else {
-      console.error('No group data found for:', name);
+      console.error('❌ No group data found for:', name);
     }
   };
 
@@ -443,16 +490,16 @@ const ShotgunAI = () => {
   // Calculate points
   const calculatePoints = (distance, isDD) => {
     // Base points: Driver gains points based on distance
-    // Formula: distance × 2 (base multiplier)
+    // Formula: distance × 2 (base multiplier) + small flat bonus
     let driverPoints = distance * 2;
 
-    // Distance bonus: Longer trips earn proportionally more
-    // Add 1% per mile as bonus (so 10 miles = +10%, 50 miles = +50%)
-    driverPoints = driverPoints * (1 + distance / 100);
+    // Small distance bonus: Add 10% flat bonus (not compounding)
+    // This keeps it more linear while still rewarding longer trips slightly
+    driverPoints = driverPoints + (distance * 0.1);
 
-    // DD bonus: 50% more points for designated driver
+    // DD bonus: 30% more points for designated driver (reduced from 50%)
     if (isDD) {
-      driverPoints = driverPoints * 1.5;
+      driverPoints = driverPoints * 1.3;
     }
 
     // Passenger penalty: Each passenger loses some points (but less than driver gains)
@@ -820,7 +867,12 @@ const ShotgunAI = () => {
 
           .warm-cream-bg {
             background:
-              linear-gradient(135deg, #FDF8F3 0%, #F8F0E8 100%);
+              linear-gradient(180deg,
+                rgba(255, 200, 180, 0.15) 0%,
+                rgba(255, 180, 150, 0.08) 50%,
+                rgba(240, 160, 130, 0.05) 100%
+              ),
+              linear-gradient(180deg, #F5F1ED 0%, #E8E2DC 50%, #DDD7D1 100%);
             position: relative;
           }
 
@@ -844,6 +896,15 @@ const ShotgunAI = () => {
 
           .deep-forest {
             color: #3D405B;
+          }
+
+          .dark-mode-bg .deep-forest {
+            color: #FFFFFF;
+          }
+
+          .dark-mode-bg .text-gray-500,
+          .dark-mode-bg .text-gray-600 {
+            color: #FFFFFF !important;
           }
 
           .soft-gold {
@@ -1092,6 +1153,14 @@ const ShotgunAI = () => {
               4px 4px 0px 0px #3D405B,
               inset 0 2px 4px rgba(0, 0, 0, 0.05);
             position: relative;
+            height: 48px;
+          }
+
+          .dark-mode-bg .retro-input {
+            background: #4B5563;
+            border-color: #6B7280;
+            color: #FFFFFF;
+            box-shadow: none;
           }
 
           .retro-input:focus {
@@ -1106,6 +1175,13 @@ const ShotgunAI = () => {
             transform: translate(-1px, -1px);
           }
 
+          .dark-mode-bg .retro-input:focus {
+            background: #374151;
+            color: #FFFFFF;
+            border-color: #FF6B4A;
+            box-shadow: 0 0 20px rgba(255, 107, 74, 0.4);
+          }
+
           .retro-input:active {
             box-shadow:
               2px 2px 0px 0px #3D405B,
@@ -1118,71 +1194,15 @@ const ShotgunAI = () => {
             font-style: italic;
           }
 
+          .dark-mode-bg .retro-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+          }
+
           /* PAPER GRAIN TEXTURE */
           .paper-grain {
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
           }
 
-          /* GRAINY STATIC EFFECT */
-          .static-grain {
-            position: relative;
-          }
-
-          .static-grain::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='staticNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23staticNoise)' opacity='0.08'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 1;
-            animation: staticShift 0.2s infinite;
-            mix-blend-mode: overlay;
-          }
-
-          /* CRT SCANLINES - Enhanced with Animation */
-          .static-grain::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-              repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15) 0px,
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-              ),
-              linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.05) 50%,
-                rgba(255, 255, 255, 0) 100%
-              );
-            background-size: 100% 100%, 100% 200%;
-            animation: scanlineMove 8s linear infinite;
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0.9;
-          }
-
-          @keyframes scanlineMove {
-            0% { background-position: 0 0, 0 0; }
-            100% { background-position: 0 0, 0 100%; }
-          }
-
-          @keyframes staticShift {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(-2px, 2px); }
-            50% { transform: translate(2px, -2px); }
-            75% { transform: translate(-2px, -2px); }
-            100% { transform: translate(0, 0); }
-          }
 
           /* NEON TITLE - Glow on Hover Only */
           .neon-title {
@@ -1637,7 +1657,7 @@ const ShotgunAI = () => {
 
       {/* LOBBY */}
       {currentView === 'lobby' && (
-        <div className={`mono-font transition-colors duration-300 ${darkMode ? 'dark-mode-bg text-white' : 'warm-cream-bg terminal-grid mesh-gradient paper-grain static-grain'}`}>
+        <div className={`mono-font transition-colors duration-300 ${darkMode ? 'dark-mode-bg text-white' : 'warm-cream-bg'}`}>
           <div className="min-h-screen flex items-center justify-center p-4">
             <div className="max-w-2xl w-full">
               {/* Header */}
@@ -1657,7 +1677,9 @@ const ShotgunAI = () => {
               </div>
 
               {/* Setup Card */}
-              <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg punk-border border-[#3D405B] shadow-retro-lg p-8 mb-6 card-float shine-effect">
+              <div className={`rounded-lg punk-border shadow-retro-lg p-8 mb-6 card-float shine-effect ${
+                darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
+              }`}>
                 <h2 className="pixel-font text-4xl deep-forest mb-6" style={{
                   textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
                 }}>CREATE YOUR CREW</h2>
@@ -1702,8 +1724,10 @@ const ShotgunAI = () => {
                 {/* Member List */}
                 <div className="mb-6">
                   <h3 className="text-sm font-bold deep-forest mb-3 uppercase">Crew Members</h3>
-                  <div className="space-y-2 max-h-64 overflow-y-auto p-4 bg-white border-4 border-[#3D405B] rounded" style={{
-                    boxShadow: '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
+                  <div className={`space-y-2 max-h-64 overflow-y-auto p-4 border-4 rounded ${
+                    darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-[#3D405B]'
+                  }`} style={{
+                    boxShadow: darkMode ? 'none' : '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
                   }}>
                     {members.length === 0 ? (
                       <p className="text-center text-gray-500 italic py-8">No members yet. Add some above!</p>
@@ -1711,7 +1735,9 @@ const ShotgunAI = () => {
                       members.map((member, index) => (
                         <div
                           key={member.id}
-                          className="flex items-center justify-between p-3 bg-[#FDF8F3] rounded border-2 border-[#3D405B] transition-all duration-300 hover:border-[#FF6B4A] group"
+                          className={`flex items-center justify-between p-3 rounded border-2 group ${
+                            darkMode ? 'bg-gray-600 border-gray-500' : 'bg-[#FDF8F3] border-[#3D405B]'
+                          }`}
                           style={{ animationDelay: `${index * 0.1}s` }}
                         >
                           <div className="flex items-center gap-3">
@@ -1749,7 +1775,9 @@ const ShotgunAI = () => {
                         className={`p-3 rounded-lg border-2 transition-all font-bold ${
                           defaultCity?.name === city.name
                             ? 'bg-[#E07A5F] text-white border-[#3D405B]'
-                            : 'bg-white border-[#3D405B] hover:bg-[#FDF8F3] text-[#3D405B]'
+                            : darkMode
+                              ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-white'
+                              : 'bg-white border-[#3D405B] hover:bg-[#FDF8F3] text-[#3D405B]'
                         }`}
                       >
                         {city.name}
@@ -1794,8 +1822,10 @@ const ShotgunAI = () => {
                 {savedGroups.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-sm font-bold deep-forest mb-3 uppercase">Saved Groups</h3>
-                    <div className="space-y-2 max-h-40 overflow-y-auto p-4 bg-white border-4 border-[#3D405B] rounded" style={{
-                      boxShadow: '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
+                    <div className={`space-y-2 max-h-40 overflow-y-auto p-4 border-4 rounded ${
+                      darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-[#3D405B]'
+                    }`} style={{
+                      boxShadow: darkMode ? 'none' : '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
                     }}>
                       {savedGroups.map((group) => (
                         <div
@@ -1803,13 +1833,15 @@ const ShotgunAI = () => {
                           className={`flex items-center justify-between p-3 rounded border-2 transition-all ${
                             groupName === group
                               ? 'bg-[#FF6B4A] border-[#3D405B]'
-                              : 'bg-[#FDF8F3] border-[#3D405B] hover:border-[#FF6B4A]'
+                              : darkMode
+                                ? 'bg-gray-600 border-gray-500 hover:border-gray-400'
+                                : 'bg-[#FDF8F3] border-[#3D405B] hover:border-[#FF6B4A]'
                           }`}
                         >
                           <button
                             onClick={() => loadGroup(group)}
                             className={`flex-1 text-left mono-font font-bold ${
-                              groupName === group ? 'text-white' : 'text-[#3D405B]'
+                              groupName === group ? 'text-white' : darkMode ? 'text-white' : 'text-[#3D405B]'
                             }`}
                           >
                             {group}
@@ -1841,7 +1873,7 @@ const ShotgunAI = () => {
 
       {/* DASHBOARD */}
       {currentView === 'dashboard' && (
-        <div className={`mono-font transition-colors duration-300 ${darkMode ? 'dark-mode-bg text-white' : 'warm-cream-bg terminal-grid mesh-gradient paper-grain static-grain'}`}>
+        <div className={`mono-font transition-colors duration-300 ${darkMode ? 'dark-mode-bg text-white' : 'warm-cream-bg'}`}>
           <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
               {/* Header */}
@@ -1888,7 +1920,7 @@ const ShotgunAI = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Leaderboard Card */}
                 <div className={`rounded-lg punk-border shadow-retro-lg overflow-hidden flex flex-col stagger-1 ${
-                  darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
+                  darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#3D405B]'
                 }`}>
                   <div className="bg-gradient-to-r from-[#E07A5F] to-[#F4A261] p-4 border-b-4 border-[#3D405B]">
                     <div className="flex items-center justify-between">
@@ -1900,14 +1932,13 @@ const ShotgunAI = () => {
                         <AlertCircle size={20} className="pixel-icon text-white cursor-help" />
                         <span className="tooltiptext">
                           <strong>How Points Work:</strong><br/>
-                          • Driver: Gains 2× distance<br/>
-                          • Distance Bonus: +1% per mile<br/>
-                          • DD Bonus: +50% points<br/>
+                          • Driver: Gains 2.1× distance<br/>
+                          • DD Bonus: +30% points<br/>
                           • Passengers: Lose 0.5× distance<br/>
                           • Lower points = drive next!<br/>
                           <br/>
                           <em>Example: 10mi trip</em><br/>
-                          Driver: +22 pts | Passengers: -5 pts each
+                          Driver: +21 pts | DD: +27 pts | Passengers: -5 pts each
                         </span>
                       </div>
                     </div>
@@ -1927,7 +1958,7 @@ const ShotgunAI = () => {
                             const percentage = (member.points / maxPoints) * 100;
 
                             return (
-                              <div key={member.id} className={`space-y-2 ${index === 0 ? 'active-driver-glow p-3 rounded-lg' : ''}`}>
+                              <div key={member.id} className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
                                     <span className="text-2xl font-bold deep-forest">
@@ -2000,7 +2031,7 @@ const ShotgunAI = () => {
 
                 {/* Trip History Card */}
                 <div className={`rounded-lg punk-border shadow-retro-lg overflow-hidden flex flex-col stagger-2 ${
-                  darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
+                  darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
                 }`}>
                   <div className="bg-gradient-to-r from-[#2A9D8F] to-[#238276] p-4 border-b-4 border-[#3D405B]">
                     <div className="flex items-center justify-between">
@@ -2048,10 +2079,10 @@ const ShotgunAI = () => {
                         trips.map((trip, index) => (
                           <div
                             key={trip.id}
-                            className={`p-4 rounded-lg border-3 transition-all duration-300 group shine-effect trip-card-hover ${
+                            className={`p-4 rounded-lg border-4 group ${
                               darkMode
-                                ? 'bg-gray-800 border-gray-600 hover:border-gray-500 shadow-retro-teal'
-                                : 'bg-white border-[#3D405B] hover:border-[#FF6B4A] shadow-retro'
+                                ? 'bg-gray-800 border-gray-600 shadow-retro-teal'
+                                : 'bg-white border-[#3D405B] shadow-retro'
                             }`}
                             style={{ animationDelay: `${index * 0.05}s` }}
                           >
@@ -2143,7 +2174,7 @@ const ShotgunAI = () => {
               {/* Map Card */}
               <div className={`rounded-lg punk-border shadow-retro-lg overflow-hidden ${
                 darkMode
-                  ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600'
+                  ? 'bg-gray-800 border-gray-600'
                   : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
               }`}>
                 <div className={`p-4 border-b-4 border-[#3D405B] ${
@@ -2729,8 +2760,8 @@ const ShotgunAI = () => {
         </div>
       )}
 
-      {/* ACHIEVEMENTS NOTIFICATION */}
-      {achievements
+      {/* ACHIEVEMENTS NOTIFICATION - Only show on dashboard */}
+      {currentView === 'dashboard' && achievements
         .filter(a => !dismissedAchievements.includes(a.id))
         .slice(-3)
         .reverse()
