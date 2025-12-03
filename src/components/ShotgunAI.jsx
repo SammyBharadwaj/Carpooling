@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Navigation, Car, Zap, Fuel, Beer, Plus, TrendingUp, Crown, UserMinus, X, Edit2, Trash2, RotateCcw, Download, Star, DollarSign, Moon, Sun, Award, BarChart3, History, AlertCircle, Save, Check, Settings } from 'lucide-react';
+import { MapPin, Navigation, Car, Zap, Fuel, Beer, Plus, TrendingUp, Crown, UserMinus, X, Edit2, Trash2, RotateCcw, Download, Star, DollarSign, Moon, Sun, Award, BarChart3, History, AlertCircle, Save, Check, Settings, LogOut } from 'lucide-react';
 import { useLoadScript, GoogleMap, DirectionsRenderer, Autocomplete } from '@react-google-maps/api';
+import { useAuth } from '../contexts/AuthContext';
+import { groupService } from '../services/firestoreService';
+import InviteModal from './InviteModal';
+import GroupSelector from './GroupSelector';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const libraries = ['places'];
@@ -114,6 +118,9 @@ const mapStyles = [
 ];
 
 const ShotgunAI = () => {
+  // Auth
+  const { user, logout } = useAuth();
+
   // Load Google Maps
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -126,7 +133,15 @@ const ShotgunAI = () => {
   // Theme
   const [darkMode, setDarkMode] = useState(false);
 
-  // Group management
+  // User display name
+  const [userDisplayName, setUserDisplayName] = useState('');
+
+  // Firestore group management
+  const [currentGroupId, setCurrentGroupId] = useState(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [firestoreLoading, setFirestoreLoading] = useState(true);
+
+  // Group management (legacy - keeping for backward compatibility)
   const [groupName, setGroupName] = useState('');
   const [savedGroups, setSavedGroups] = useState([]);
   const [showSaveGroupModal, setShowSaveGroupModal] = useState(false);
@@ -230,7 +245,154 @@ const ShotgunAI = () => {
     if (savedAchievements) setAchievements(JSON.parse(savedAchievements));
   }, []);
 
-  // Save to localStorage whenever data changes
+  // Load user display name from localStorage
+  useEffect(() => {
+    if (user) {
+      const pendingName = localStorage.getItem('pendingDisplayName');
+      if (pendingName) {
+        setUserDisplayName(pendingName);
+        // Optionally clear it after using
+        // localStorage.removeItem('pendingDisplayName');
+      } else {
+        setUserDisplayName(user.displayName || user.email?.split('@')[0] || 'User');
+      }
+    }
+  }, [user]);
+
+  // Initialize Firestore group for user
+  useEffect(() => {
+    if (!user) {
+      setFirestoreLoading(false);
+      return;
+    }
+
+    const initializeGroup = async () => {
+      try {
+        setFirestoreLoading(true);
+
+        // Check if user has any groups
+        let userGroups = await groupService.getUserGroups(user.uid);
+
+        // If no groups, create a default one
+        if (userGroups.length === 0) {
+          console.log('🆕 Creating first group for user');
+
+          const firstMember = {
+            userId: user.uid,
+            email: user.email,
+            name: userDisplayName || user.displayName || user.email.split('@')[0],
+            vehicleType: 'gas',
+            points: 0,
+            tripCount: 0,
+            milesDriven: 0,
+            ddCount: 0,
+            status: 'active',
+            joinedAt: new Date().toISOString()
+          };
+
+          const newGroup = await groupService.createGroup(user.uid, {
+            name: `${firstMember.name}'s Crew`,
+            members: [firstMember],
+            trips: [],
+            achievements: [],
+            defaultCity: null
+          });
+
+          setCurrentGroupId(newGroup.id);
+          setGroupName(newGroup.name);
+          localStorage.setItem('activeGroupId', newGroup.id);
+        } else {
+          // Load most recent group or the one from localStorage
+          const savedGroupId = localStorage.getItem('activeGroupId');
+          const groupToLoad = savedGroupId
+            ? userGroups.find(g => g.id === savedGroupId) || userGroups[0]
+            : userGroups[0];
+
+          setCurrentGroupId(groupToLoad.id);
+          localStorage.setItem('activeGroupId', groupToLoad.id);
+
+          // Load group data
+          loadGroupData(groupToLoad.id);
+        }
+      } catch (error) {
+        console.error('❌ Error initializing group:', error);
+      } finally {
+        setFirestoreLoading(false);
+      }
+    };
+
+    initializeGroup();
+  }, [user, userDisplayName]);
+
+  // Load group data from Firestore
+  const loadGroupData = async (groupId) => {
+    try {
+      const groupData = await groupService.getGroup(groupId);
+      if (groupData) {
+        setGroupName(groupData.name);
+        setMembers(groupData.members || []);
+        setTrips(groupData.trips || []);
+        setDefaultCity(groupData.defaultCity || null);
+        setAchievements(groupData.achievements || []);
+        console.log('📥 Loaded group from Firestore:', groupData.name);
+      }
+    } catch (error) {
+      console.error('❌ Error loading group data:', error);
+    }
+  };
+
+  // Subscribe to real-time group updates
+  useEffect(() => {
+    if (!currentGroupId) return;
+
+    console.log('👂 Subscribing to group updates:', currentGroupId);
+    const unsubscribe = groupService.subscribeToGroup(currentGroupId, (groupData) => {
+      if (groupData) {
+        setGroupName(groupData.name);
+        setMembers(groupData.members || []);
+        setTrips(groupData.trips || []);
+        setDefaultCity(groupData.defaultCity || null);
+        setAchievements(groupData.achievements || []);
+        console.log('🔄 Real-time update received');
+      }
+    });
+
+    return () => {
+      console.log('🔇 Unsubscribing from group updates');
+      unsubscribe();
+    };
+  }, [currentGroupId]);
+
+  // Save to Firestore whenever data changes
+  useEffect(() => {
+    if (!currentGroupId || firestoreLoading) return;
+
+    // Skip saving on initial mount (empty data)
+    if (members.length === 0 && trips.length === 0 && !defaultCity) {
+      console.log('⏭️ Skipping Firestore save - no data yet');
+      return;
+    }
+
+    const saveToFirestore = async () => {
+      try {
+        await groupService.updateGroup(currentGroupId, {
+          members,
+          trips,
+          defaultCity,
+          achievements
+        });
+        console.log('💾 Saved to Firestore');
+      } catch (error) {
+        console.error('❌ Error saving to Firestore:', error);
+      }
+    };
+
+    // Debounce saves
+    const timeoutId = setTimeout(saveToFirestore, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [currentGroupId, members, trips, defaultCity, achievements, firestoreLoading]);
+
+  // Save to localStorage whenever data changes (legacy backup)
   useEffect(() => {
     // Skip saving on initial mount (empty data)
     if (members.length === 0 && trips.length === 0 && !defaultCity) {
@@ -362,24 +524,49 @@ const ShotgunAI = () => {
     }
   }, [allTripDirections, selectedTripForMap]);
 
-  // Add member
+  // Add member (now opens invite modal)
   const addMember = (e) => {
     e.preventDefault();
-    if (!newMemberName.trim()) return;
+    setShowInviteModal(true);
+  };
 
-    const newMember = {
-      id: Date.now(),
-      name: newMemberName.trim(),
-      vehicleType: newMemberVehicle,
-      points: 0,
-      tripCount: 0,
-      milesDriven: 0,
-      ddCount: 0,
-    };
+  // Handle group switching
+  const handleGroupChange = async (group) => {
+    setCurrentGroupId(group.id);
+    localStorage.setItem('activeGroupId', group.id);
+    await loadGroupData(group.id);
+  };
 
-    setMembers([...members, newMember]);
-    setNewMemberName('');
-    setNewMemberVehicle('gas');
+  // Handle create new group
+  const handleCreateNewGroup = async () => {
+    try {
+      const newMember = {
+        userId: user.uid,
+        email: user.email,
+        name: userDisplayName || user.displayName || user.email.split('@')[0],
+        vehicleType: 'gas',
+        points: 0,
+        tripCount: 0,
+        milesDriven: 0,
+        ddCount: 0,
+        status: 'active',
+        joinedAt: new Date().toISOString()
+      };
+
+      const newGroup = await groupService.createGroup(user.uid, {
+        name: `${newMember.name}'s New Crew`,
+        members: [newMember],
+        trips: [],
+        achievements: [],
+        defaultCity: null
+      });
+
+      setCurrentGroupId(newGroup.id);
+      localStorage.setItem('activeGroupId', newGroup.id);
+      await loadGroupData(newGroup.id);
+    } catch (error) {
+      console.error('Error creating new group:', error);
+    }
   };
 
   // Remove member
@@ -1676,50 +1863,30 @@ const ShotgunAI = () => {
                 </p>
               </div>
 
+              {/* Group Selector */}
+              <div className="mb-6">
+                <GroupSelector
+                  currentGroupId={currentGroupId}
+                  onGroupChange={handleGroupChange}
+                  onCreateNew={handleCreateNewGroup}
+                />
+              </div>
+
               {/* Setup Card */}
               <div className={`rounded-lg punk-border shadow-retro-lg p-8 mb-6 card-float shine-effect ${
                 darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
               }`}>
                 <h2 className="pixel-font text-4xl deep-forest mb-6" style={{
                   textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
-                }}>CREATE YOUR CREW</h2>
+                }}>INVITE MEMBERS</h2>
 
-                {/* Add Member Form */}
-                <form onSubmit={addMember} className="mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-bold deep-forest mb-2">
-                        NAME
-                      </label>
-                      <input
-                        type="text"
-                        value={newMemberName}
-                        onChange={(e) => setNewMemberName(e.target.value)}
-                        className="retro-input w-full px-4 py-2 rounded"
-                        placeholder="Enter name..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold deep-forest mb-2">
-                        CAR TYPE
-                      </label>
-                      <select
-                        value={newMemberVehicle}
-                        onChange={(e) => setNewMemberVehicle(e.target.value)}
-                        className="retro-input w-full px-4 py-2 rounded text-[#3D405B] font-bold"
-                      >
-                        <option value="gas">⛽ Gas</option>
-                        <option value="electric">⚡ Electric</option>
-                      </select>
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-2xl"
-                  >
-                    ADD MEMBER
-                  </button>
-                </form>
+                {/* Invite Member Button */}
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-2xl mb-6"
+                >
+                  + INVITE MEMBER
+                </button>
 
                 {/* Member List */}
                 <div className="mb-6">
@@ -1884,6 +2051,15 @@ const ShotgunAI = () => {
                   SHOTGUN.AI
                 </h1>
                 <div className="flex items-center gap-2">
+                  {user && (
+                    <div className={`px-3 py-2 border-4 border-[#3D405B] shadow-retro ${
+                      darkMode ? 'bg-gray-800' : 'bg-white'
+                    }`}>
+                      <p className="text-xs font-bold deep-forest truncate max-w-[150px] mono-font">
+                        {userDisplayName || user.displayName || user.email}
+                      </p>
+                    </div>
+                  )}
                   <div className="tooltip">
                     <button
                       className={`p-3 border-4 border-[#3D405B] shadow-retro transition-all ${
@@ -1912,6 +2088,15 @@ const ShotgunAI = () => {
                     aria-label="Go to settings"
                   >
                     <Settings size={20} className="pixel-icon" />
+                  </button>
+                  <button
+                    onClick={logout}
+                    className={`p-3 border-4 border-[#3D405B] shadow-retro transition-all ${
+                      darkMode ? 'bg-red-900 text-red-300' : 'bg-red-100 text-red-700'
+                    }`}
+                    aria-label="Logout"
+                  >
+                    <LogOut size={20} className="pixel-icon" />
                   </button>
                 </div>
               </div>
@@ -2788,6 +2973,15 @@ const ShotgunAI = () => {
             </div>
           </div>
         ))}
+
+      {/* Invite Modal */}
+      <InviteModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        groupId={currentGroupId}
+        groupName={groupName}
+        userEmail={user?.email}
+      />
     </>
   );
 };
