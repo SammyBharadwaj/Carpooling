@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Users, Car, Check, X } from 'lucide-react';
+import { Users, Car, Check, X, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { inviteService, groupService } from '../services/firestoreService';
 
@@ -70,9 +70,8 @@ const AcceptInvite = () => {
       setAccepting(true);
       setError('');
 
-      // Get member details from localStorage (set during invite creation)
-      const memberDataStr = localStorage.getItem(`invite_${inviteId}`);
-      const memberData = memberDataStr ? JSON.parse(memberDataStr) : {};
+      // Get member details from invite document (stored in Firestore)
+      const memberData = invite.memberData || {};
 
       // Add user to group
       await groupService.addMemberToGroup(invite.groupId, user.uid);
@@ -97,9 +96,6 @@ const AcceptInvite = () => {
 
       // Mark invite as used
       await inviteService.markInviteUsed(inviteId);
-
-      // Clean up localStorage
-      localStorage.removeItem(`invite_${inviteId}`);
 
       // Store the new groupId in user's active groups
       const activeGroupId = localStorage.getItem('activeGroupId');

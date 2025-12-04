@@ -24,21 +24,21 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, userEmail }) => {
     try {
       setLoading(true);
 
-      // Create invite in Firestore
-      const inviteId = await inviteService.createInvite(
-        groupId,
-        groupName,
-        userEmail,
-        'link'
-      );
-
-      // Store member details in the invite (for display purposes)
-      const inviteData = {
+      // Prepare member details
+      const memberData = {
         email: email.trim(),
         name: name.trim() || email.split('@')[0],
         vehicleType
       };
-      localStorage.setItem(`invite_${inviteId}`, JSON.stringify(inviteData));
+
+      // Create invite in Firestore with member details
+      const inviteId = await inviteService.createInvite(
+        groupId,
+        groupName,
+        userEmail,
+        'link',
+        memberData
+      );
 
       // Generate invite link
       const link = `${window.location.origin}/invite/${inviteId}`;
