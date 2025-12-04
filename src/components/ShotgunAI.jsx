@@ -761,7 +761,7 @@ const ShotgunAI = () => {
   // Log trip
   const logTrip = (e) => {
     e.preventDefault();
-    if (!tripDriver || !tripFrom || !tripTo || !tripDistance || tripPassengers.length === 0) return;
+    if (!tripDriver || !tripFrom || !tripTo || !tripDistance) return;
 
     const baseDistance = parseFloat(tripDistance);
     const distance = isRoundTrip ? baseDistance * 2 : baseDistance;
