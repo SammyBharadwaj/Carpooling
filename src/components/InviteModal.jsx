@@ -36,6 +36,7 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, currentMembers, onMe
 
       // Create new pending member
       const newMember = {
+        id: Date.now(), // Unique ID for this member
         userId: null, // Will be set when they sign in
         email: emailLower,
         name: name.trim() || email.split('@')[0],

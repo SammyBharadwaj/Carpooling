@@ -289,6 +289,7 @@ const ShotgunAI = () => {
           console.log('🆕 Creating first group for user');
 
           const firstMember = {
+            id: Date.now(),
             userId: user.uid,
             email: user.email,
             name: userDisplayName || user.displayName || user.email.split('@')[0],
@@ -478,6 +479,12 @@ const ShotgunAI = () => {
             setDirections(result);
             const distanceInMiles = (result.routes[0].legs[0].distance.value / 1609.34).toFixed(1);
             setTripDistance(distanceInMiles);
+
+            // Center map on the route
+            const bounds = new window.google.maps.LatLngBounds();
+            result.routes[0].overview_path.forEach(point => bounds.extend(point));
+            const center = bounds.getCenter();
+            setMapCenter({ lat: center.lat(), lng: center.lng() });
           }
         }
       );
