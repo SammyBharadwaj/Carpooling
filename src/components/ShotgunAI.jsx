@@ -270,6 +270,17 @@ const ShotgunAI = () => {
       try {
         setFirestoreLoading(true);
 
+        // Check if user's email matches any pending members and activate them
+        const activatedGroups = await groupService.activatePendingMember(
+          user.email,
+          user.uid,
+          userDisplayName || user.displayName
+        );
+
+        if (activatedGroups.length > 0) {
+          console.log('✅ Activated pending member in', activatedGroups.length, 'group(s)');
+        }
+
         // Check if user has any groups
         let userGroups = await groupService.getUserGroups(user.uid);
 
@@ -1878,14 +1889,14 @@ const ShotgunAI = () => {
               }`}>
                 <h2 className="pixel-font text-4xl deep-forest mb-6" style={{
                   textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
-                }}>INVITE MEMBERS</h2>
+                }}>ADD MEMBERS</h2>
 
-                {/* Invite Member Button */}
+                {/* Add Member Button */}
                 <button
                   onClick={() => setShowInviteModal(true)}
                   className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-2xl mb-6"
                 >
-                  + INVITE MEMBER
+                  + ADD MEMBER
                 </button>
 
                 {/* Member List */}
@@ -2980,7 +2991,7 @@ const ShotgunAI = () => {
         onClose={() => setShowInviteModal(false)}
         groupId={currentGroupId}
         groupName={groupName}
-        userEmail={user?.email}
+        currentMembers={members}
       />
     </>
   );

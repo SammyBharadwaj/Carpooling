@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { X, Copy, Check, Mail } from 'lucide-react';
-import { inviteService } from '../services/firestoreService';
+import { X, Check, UserPlus } from 'lucide-react';
+import { groupService } from '../services/firestoreService';
 
-const InviteModal = ({ isOpen, onClose, groupId, groupName, userEmail }) => {
+const InviteModal = ({ isOpen, onClose, groupId, groupName, currentMembers, onMemberAdded }) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [vehicleType, setVehicleType] = useState('gas');
-  const [inviteLink, setInviteLink] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGenerateInvite = async (e) => {
+  const handleAddMember = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -21,49 +20,60 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, userEmail }) => {
       return;
     }
 
+    // Check if email already exists in group
+    const emailLower = email.trim().toLowerCase();
+    const memberExists = currentMembers.some(
+      member => member.email?.toLowerCase() === emailLower
+    );
+
+    if (memberExists) {
+      setError('This email is already in the crew');
+      return;
+    }
+
     try {
       setLoading(true);
 
-      // Prepare member details
-      const memberData = {
-        email: email.trim(),
+      // Create new pending member
+      const newMember = {
+        userId: null, // Will be set when they sign in
+        email: emailLower,
         name: name.trim() || email.split('@')[0],
-        vehicleType
+        vehicleType,
+        points: 0,
+        tripCount: 0,
+        milesDriven: 0,
+        ddCount: 0,
+        status: 'pending', // pending until they sign in
+        invitedAt: new Date().toISOString()
       };
 
-      // Create invite in Firestore with member details
-      const inviteId = await inviteService.createInvite(
-        groupId,
-        groupName,
-        userEmail,
-        'link',
-        memberData
-      );
+      // Add member to group
+      const updatedMembers = [...currentMembers, newMember];
+      await groupService.updateGroup(groupId, { members: updatedMembers });
 
-      // Generate invite link
-      const link = `${window.location.origin}/invite/${inviteId}`;
-      setInviteLink(link);
+      // Show success
+      setSuccess(true);
+      if (onMemberAdded) onMemberAdded();
+
+      // Auto-close after 2 seconds
+      setTimeout(() => {
+        handleClose();
+      }, 2000);
 
     } catch (err) {
-      console.error('Error generating invite:', err);
-      setError('Failed to generate invite link. Please try again.');
+      console.error('Error adding member:', err);
+      setError('Failed to add member. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(inviteLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleClose = () => {
     setEmail('');
     setName('');
     setVehicleType('gas');
-    setInviteLink('');
-    setCopied(false);
+    setSuccess(false);
     setError('');
     onClose();
   };
@@ -78,7 +88,7 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, userEmail }) => {
           <h2 className="pixel-font text-3xl deep-forest" style={{
             textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
           }}>
-            INVITE MEMBER
+            ADD MEMBER
           </h2>
           <button
             onClick={handleClose}
@@ -89,9 +99,15 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, userEmail }) => {
           </button>
         </div>
 
-        {!inviteLink ? (
-          // Invite Form
-          <form onSubmit={handleGenerateInvite}>
+        {!success ? (
+          // Add Member Form
+          <form onSubmit={handleAddMember}>
+            <div className="mb-4 p-3 bg-blue-50 border-2 border-blue-500 rounded">
+              <p className="text-blue-600 text-sm mono-font">
+                💡 Members will be added to your crew immediately. When they sign in with this email, they'll automatically get access!
+              </p>
+            </div>
+
             <div className="mb-4">
               <label className="block text-sm font-bold deep-forest mb-2 mono-font">
                 EMAIL ADDRESS *
@@ -144,60 +160,25 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, userEmail }) => {
               disabled={loading}
               className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
             >
-              {loading ? 'GENERATING...' : 'GENERATE INVITE LINK'}
+              {loading ? 'ADDING...' : 'ADD MEMBER'}
             </button>
           </form>
         ) : (
-          // Invite Link Display
+          // Success Message
           <div>
-            <div className="mb-4 p-4 bg-green-50 border-2 border-green-500 rounded">
-              <div className="flex items-center gap-2 mb-2">
-                <Check size={20} className="text-green-600" />
-                <p className="text-green-600 font-bold mono-font">Invite Link Generated!</p>
+            <div className="mb-6 p-6 bg-green-50 border-2 border-green-500 rounded text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+                  <Check size={32} className="text-white" />
+                </div>
               </div>
+              <p className="text-green-600 font-bold mono-font text-lg mb-2">
+                Member Added!
+              </p>
               <p className="text-sm mono-font deep-forest">
-                Share this link with <strong>{email}</strong>
+                <strong>{email}</strong> has been added to {groupName}. They'll get access when they sign in!
               </p>
             </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-bold deep-forest mb-2 mono-font">
-                INVITE LINK
-              </label>
-              <div className="retro-input w-full px-4 py-2 rounded mono-font break-all text-sm">
-                {inviteLink}
-              </div>
-            </div>
-
-            <button
-              onClick={handleCopyLink}
-              className={`pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl mb-3 ${
-                copied ? 'opacity-75' : ''
-              }`}
-            >
-              {copied ? (
-                <>
-                  <Check size={20} className="inline mr-2" />
-                  COPIED!
-                </>
-              ) : (
-                <>
-                  <Copy size={20} className="inline mr-2" />
-                  COPY LINK
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={handleClose}
-              className="pixel-button-secondary w-full py-3 rounded-lg text-white pixel-font text-xl"
-            >
-              DONE
-            </button>
-
-            <p className="text-xs mono-font text-gray-600 mt-4 text-center">
-              💡 Send this link via text, email, or any messaging app
-            </p>
           </div>
         )}
       </div>

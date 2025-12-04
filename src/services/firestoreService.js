@@ -178,6 +178,65 @@ export const groupService = {
       console.error('❌ Error removing member:', error);
       throw error;
     }
+  },
+
+  // Find and activate pending member by email
+  async activatePendingMember(email, userId, displayName) {
+    try {
+      const emailLower = email.toLowerCase();
+
+      // Get all groups
+      const groupsRef = collection(db, 'groups');
+      const querySnapshot = await getDocs(groupsRef);
+
+      const activatedGroups = [];
+
+      for (const docSnap of querySnapshot.docs) {
+        const groupData = docSnap.data();
+        const members = groupData.members || [];
+
+        // Find pending member with matching email
+        let updated = false;
+        const updatedMembers = members.map(member => {
+          if (
+            member.email?.toLowerCase() === emailLower &&
+            member.status === 'pending' &&
+            !member.userId
+          ) {
+            updated = true;
+            return {
+              ...member,
+              userId,
+              name: displayName || member.name,
+              status: 'active',
+              activatedAt: new Date().toISOString()
+            };
+          }
+          return member;
+        });
+
+        if (updated) {
+          // Update group with activated member
+          await updateDoc(doc(db, 'groups', docSnap.id), {
+            members: updatedMembers,
+            memberIds: arrayUnion(userId),
+            updatedAt: serverTimestamp()
+          });
+
+          activatedGroups.push({
+            id: docSnap.id,
+            name: groupData.name
+          });
+
+          console.log('✅ Activated pending member in group:', docSnap.id);
+        }
+      }
+
+      return activatedGroups;
+    } catch (error) {
+      console.error('❌ Error activating pending member:', error);
+      throw error;
+    }
   }
 };
 
