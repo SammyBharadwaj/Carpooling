@@ -589,6 +589,15 @@ const ShotgunAI = () => {
 
   // Remove member
   const removeMember = (id) => {
+    // Find the member being removed
+    const memberToRemove = members.find(m => m.id === id);
+
+    // Prevent removing yourself
+    if (memberToRemove && memberToRemove.email?.toLowerCase() === user?.email?.toLowerCase()) {
+      alert("You cannot remove yourself from the crew!");
+      return;
+    }
+
     setMembers(members.filter(m => m.id !== id));
   };
 
@@ -1934,15 +1943,22 @@ const ShotgunAI = () => {
                               )}
                               <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-20 blur-lg transition-opacity"></div>
                             </div>
-                            <span className="font-bold deep-forest group-hover:text-[#FF6B4A] transition-colors">{member.name}</span>
+                            <span className="font-bold deep-forest group-hover:text-[#FF6B4A] transition-colors">
+                              {member.name}
+                              {member.email?.toLowerCase() === user?.email?.toLowerCase() && (
+                                <span className="text-xs ml-2 text-gray-500">(You)</span>
+                              )}
+                            </span>
                           </div>
-                          <button
-                            onClick={() => removeMember(member.id)}
-                            className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded transition-all hover:scale-110"
-                            aria-label={`Remove ${member.name} from crew`}
-                          >
-                            <UserMinus size={18} className="pixel-icon" />
-                          </button>
+                          {member.email?.toLowerCase() !== user?.email?.toLowerCase() && (
+                            <button
+                              onClick={() => removeMember(member.id)}
+                              className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded transition-all hover:scale-110"
+                              aria-label={`Remove ${member.name} from crew`}
+                            >
+                              <UserMinus size={18} className="pixel-icon" />
+                            </button>
+                          )}
                         </div>
                       ))
                     )}
