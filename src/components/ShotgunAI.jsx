@@ -195,6 +195,7 @@ const ShotgunAI = () => {
   const [directions, setDirections] = useState(null);
   const [allTripDirections, setAllTripDirections] = useState([]);
   const [selectedTripForMap, setSelectedTripForMap] = useState('all'); // 'all' or trip id
+  const [mapCenter, setMapCenter] = useState(null); // Dynamic map center for trip routes
   const mapRef = useRef(null);
   const fromAutocompleteRef = useRef(null);
   const toAutocompleteRef = useRef(null);
@@ -480,11 +481,15 @@ const ShotgunAI = () => {
             const distanceInMiles = (result.routes[0].legs[0].distance.value / 1609.34).toFixed(1);
             setTripDistance(distanceInMiles);
 
-            // Center map on the route
-            const bounds = new window.google.maps.LatLngBounds();
-            result.routes[0].overview_path.forEach(point => bounds.extend(point));
+            // Center map on the route and fit bounds
+            const bounds = result.routes[0].bounds;
             const center = bounds.getCenter();
             setMapCenter({ lat: center.lat(), lng: center.lng() });
+
+            // Fit the map to show the entire route
+            if (mapRef.current) {
+              mapRef.current.fitBounds(bounds);
+            }
           }
         }
       );
@@ -927,6 +932,7 @@ const ShotgunAI = () => {
     setIsDD(false);
     setIsRoundTrip(false);
     setDirections(null);
+    setMapCenter(null); // Reset map to default view
   };
 
   // Calculate next driver (slot machine)
@@ -1033,8 +1039,8 @@ const ShotgunAI = () => {
     }
   };
 
-  // Map center
-  const mapCenter = defaultCity || { lat: 47.6062, lng: -122.3321 }; // Default to Seattle
+  // Map center - use dynamic center for trip routes, or default city, or Seattle
+  const currentMapCenter = mapCenter || defaultCity || { lat: 47.6062, lng: -122.3321 };
 
   if (loadError) return <div className="p-8 text-center">Error loading maps</div>;
   if (!isLoaded) return <div className="p-8 text-center">Loading maps...</div>;
@@ -2466,7 +2472,7 @@ const ShotgunAI = () => {
                   <div className="rounded-lg overflow-hidden border-4 border-[#3D405B]" style={{ height: '400px' }}>
                     <GoogleMap
                       mapContainerStyle={{ width: '100%', height: '100%' }}
-                      center={mapCenter}
+                      center={currentMapCenter}
                       zoom={12}
                       onLoad={(map) => mapRef.current = map}
                       options={{
@@ -2612,8 +2618,9 @@ const ShotgunAI = () => {
                 <div className="rounded-lg overflow-hidden border-4 border-[#3D405B]" style={{ height: '250px' }}>
                   <GoogleMap
                     mapContainerStyle={{ width: '100%', height: '100%' }}
-                    center={mapCenter}
+                    center={currentMapCenter}
                     zoom={12}
+                    onLoad={(map) => mapRef.current = map}
                     options={{
                       styles: mapStyles,
                       disableDefaultUI: true,
