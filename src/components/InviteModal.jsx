@@ -1,81 +1,59 @@
-import { useState } from 'react';
-import { X, Check, UserPlus } from 'lucide-react';
-import { groupService } from '../services/firestoreService';
+import { useState, useEffect } from 'react';
+import { X, Check, UserPlus, Copy, Link as LinkIcon } from 'lucide-react';
+import { inviteService } from '../services/firestoreService';
 
-const InviteModal = ({ isOpen, onClose, groupId, groupName, currentMembers, onMemberAdded }) => {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [vehicleType, setVehicleType] = useState('gas');
-  const [success, setSuccess] = useState(false);
+const InviteModal = ({ isOpen, onClose, groupId, groupName, currentMembers, onMemberAdded, inviterEmail }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [inviteLink, setInviteLink] = useState('');
+  const [copied, setCopied] = useState(false);
 
-  const handleAddMember = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    // Validate email
-    if (!email.trim() || !email.includes('@')) {
-      setError('Please enter a valid email address');
-      return;
+  useEffect(() => {
+    if (isOpen && !inviteLink) {
+      generateInviteLink();
     }
+  }, [isOpen]);
 
-    // Check if email already exists in group
-    const emailLower = email.trim().toLowerCase();
-    const memberExists = currentMembers.some(
-      member => member.email?.toLowerCase() === emailLower
-    );
-
-    if (memberExists) {
-      setError('This email is already in the crew');
-      return;
-    }
-
+  const generateInviteLink = async () => {
     try {
       setLoading(true);
+      setError('');
 
-      // Create new pending member
-      const newMember = {
-        id: Date.now(), // Unique ID for this member
-        userId: null, // Will be set when they sign in
-        email: emailLower,
-        name: name.trim() || email.split('@')[0],
-        vehicleType,
-        points: 0,
-        tripCount: 0,
-        milesDriven: 0,
-        ddCount: 0,
-        status: 'pending', // pending until they sign in
-        invitedAt: new Date().toISOString()
-      };
+      // Create invite link
+      const inviteId = await inviteService.createInvite(
+        groupId,
+        groupName,
+        inviterEmail || 'someone',
+        'link',
+        {} // No member data needed for link invites
+      );
 
-      // Add member to group
-      const updatedMembers = [...currentMembers, newMember];
-      await groupService.updateGroup(groupId, { members: updatedMembers });
-
-      // Show success
-      setSuccess(true);
-      if (onMemberAdded) onMemberAdded();
-
-      // Auto-close after 2 seconds
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
+      // Generate the invite URL
+      const inviteUrl = `${window.location.origin}/invite/${inviteId}`;
+      setInviteLink(inviteUrl);
 
     } catch (err) {
-      console.error('Error adding member:', err);
-      setError('Failed to add member. Please try again.');
+      console.error('Error generating invite link:', err);
+      setError('Failed to generate invite link. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   const handleClose = () => {
-    setEmail('');
-    setName('');
-    setVehicleType('gas');
-    setSuccess(false);
     setError('');
+    setInviteLink('');
+    setCopied(false);
     onClose();
   };
 
@@ -100,88 +78,89 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, currentMembers, onMe
           </button>
         </div>
 
-        {!success ? (
-          // Add Member Form
-          <form onSubmit={handleAddMember}>
-            <div className="mb-4 p-3 bg-blue-50 border-2 border-blue-500 rounded">
-              <p className="text-blue-600 text-sm mono-font">
-                💡 Members will be added to your crew immediately. When they sign in with this email, they'll automatically get access!
-              </p>
+        {/* Info Message */}
+        <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-500 rounded">
+          <p className="text-blue-600 text-sm mono-font">
+            💡 Copy this invite link and share it with anyone you want to add to your crew. When they click it and sign in with Google, they'll instantly join!
+          </p>
+        </div>
+
+        {loading ? (
+          // Loading State
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#FF6B4A] border-t-transparent mb-4"></div>
+            <p className="mono-font text-sm deep-forest">Generating invite link...</p>
+          </div>
+        ) : error ? (
+          // Error State
+          <div>
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded">
+              <p className="text-red-600 text-sm font-bold mono-font">{error}</p>
             </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-bold deep-forest mb-2 mono-font">
-                EMAIL ADDRESS *
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="retro-input w-full px-4 py-2 rounded mono-font"
-                placeholder="friend@example.com"
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-bold deep-forest mb-2 mono-font">
-                NAME (OPTIONAL)
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="retro-input w-full px-4 py-2 rounded mono-font"
-                placeholder="Auto-filled from email if empty"
-              />
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-bold deep-forest mb-2 mono-font">
-                CAR TYPE
-              </label>
-              <select
-                value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value)}
-                className="retro-input w-full px-4 py-2 rounded mono-font text-[#3D405B] font-bold"
-              >
-                <option value="gas">⛽ Gas</option>
-                <option value="electric">⚡ Electric</option>
-              </select>
-            </div>
-
-            {error && (
-              <div className="mb-4 p-3 bg-red-50 border-2 border-red-500 rounded">
-                <p className="text-red-600 text-sm font-bold mono-font">{error}</p>
-              </div>
-            )}
-
             <button
-              type="submit"
-              disabled={loading}
-              className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
+              onClick={generateInviteLink}
+              className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl mb-3"
             >
-              {loading ? 'ADDING...' : 'ADD MEMBER'}
+              TRY AGAIN
             </button>
-          </form>
-        ) : (
-          // Success Message
+            <button
+              onClick={handleClose}
+              className="pixel-button-secondary w-full py-3 rounded-lg text-white pixel-font text-xl"
+            >
+              CLOSE
+            </button>
+          </div>
+        ) : inviteLink ? (
+          // Show Invite Link
           <div>
             <div className="mb-6 p-6 bg-green-50 border-2 border-green-500 rounded text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-                  <Check size={32} className="text-white" />
+                  <LinkIcon size={32} className="text-white" />
                 </div>
               </div>
               <p className="text-green-600 font-bold mono-font text-lg mb-2">
-                Member Added!
+                Invite Link Ready!
               </p>
               <p className="text-sm mono-font deep-forest">
-                <strong>{email}</strong> has been added to {groupName}. They'll get access when they sign in!
+                Share this link with anyone to invite them to <strong>{groupName}</strong>
               </p>
             </div>
+
+            {/* Invite Link Section */}
+            <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-500 rounded">
+              <div className="flex items-center gap-2 mb-3">
+                <LinkIcon size={20} className="text-blue-600" />
+                <p className="text-blue-600 font-bold mono-font text-sm">
+                  Your Invite Link:
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inviteLink}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-white border-2 border-blue-300 rounded mono-font text-xs"
+                  onClick={(e) => e.target.select()}
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold mono-font text-sm transition-colors flex items-center gap-2"
+                >
+                  <Copy size={16} />
+                  {copied ? 'COPIED!' : 'COPY'}
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={handleClose}
+              className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
+            >
+              DONE
+            </button>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

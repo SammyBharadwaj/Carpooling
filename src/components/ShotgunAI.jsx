@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { groupService } from '../services/firestoreService';
 import InviteModal from './InviteModal';
 import GroupSelector from './GroupSelector';
+import TVWrapper from './TVWrapper';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const libraries = ['places'];
@@ -17,35 +18,35 @@ const PixelGasCar = ({ className = "" }) => (
     <rect x="16" y="8" width="4" height="4" fill="#E07A5F"/>
     <rect x="20" y="8" width="4" height="4" fill="#E07A5F"/>
     <rect x="8" y="4" width="4" height="4" fill="#FF6B4A"/>
-    <rect x="12" y="4" width="4" height="4" fill="#87CEEB"/>
-    <rect x="16" y="4" width="4" height="4" fill="#87CEEB"/>
+    <rect x="12" y="4" width="4" height="4" fill="#555"/>
+    <rect x="16" y="4" width="4" height="4" fill="#555"/>
     <rect x="20" y="4" width="4" height="4" fill="#FF6B4A"/>
     <rect x="6" y="12" width="4" height="4" fill="#3D405B"/>
     <rect x="10" y="12" width="2" height="2" fill="#FFFFFF"/>
     <rect x="22" y="12" width="4" height="4" fill="#3D405B"/>
     <rect x="24" y="12" width="2" height="2" fill="#FFFFFF"/>
-    <rect x="12" y="0" width="4" height="4" fill="#FFD700"/>
-    <rect x="16" y="0" width="4" height="4" fill="#FFD700"/>
+    <rect x="12" y="0" width="4" height="4" fill="#FFB088"/>
+    <rect x="16" y="0" width="4" height="4" fill="#FFB088"/>
   </svg>
 );
 
 const PixelElectricCar = ({ className = "" }) => (
   <svg width="32" height="20" viewBox="0 0 32 20" className={className} style={{ imageRendering: 'pixelated' }}>
-    <rect x="8" y="8" width="4" height="4" fill="#2A9D8F"/>
-    <rect x="12" y="8" width="4" height="4" fill="#2A9D8F"/>
-    <rect x="16" y="8" width="4" height="4" fill="#2A9D8F"/>
-    <rect x="20" y="8" width="4" height="4" fill="#2A9D8F"/>
-    <rect x="8" y="4" width="4" height="4" fill="#4ECDC4"/>
-    <rect x="12" y="4" width="4" height="4" fill="#87CEEB"/>
-    <rect x="16" y="4" width="4" height="4" fill="#87CEEB"/>
-    <rect x="20" y="4" width="4" height="4" fill="#4ECDC4"/>
+    <rect x="8" y="8" width="4" height="4" fill="#FF8B6A"/>
+    <rect x="12" y="8" width="4" height="4" fill="#FF8B6A"/>
+    <rect x="16" y="8" width="4" height="4" fill="#FF8B6A"/>
+    <rect x="20" y="8" width="4" height="4" fill="#FF8B6A"/>
+    <rect x="8" y="4" width="4" height="4" fill="#FFA07A"/>
+    <rect x="12" y="4" width="4" height="4" fill="#555"/>
+    <rect x="16" y="4" width="4" height="4" fill="#555"/>
+    <rect x="20" y="4" width="4" height="4" fill="#FFA07A"/>
     <rect x="6" y="12" width="4" height="4" fill="#3D405B"/>
     <rect x="10" y="12" width="2" height="2" fill="#FFFFFF"/>
     <rect x="22" y="12" width="4" height="4" fill="#3D405B"/>
     <rect x="24" y="12" width="2" height="2" fill="#FFFFFF"/>
-    <rect x="14" y="0" width="4" height="4" fill="#FFD700"/>
-    <rect x="13" y="1" width="2" height="2" fill="#FFF700"/>
-    <rect x="17" y="1" width="2" height="2" fill="#FFF700"/>
+    <rect x="14" y="0" width="4" height="4" fill="#FFB088"/>
+    <rect x="13" y="1" width="2" height="2" fill="#FFCAA0"/>
+    <rect x="17" y="1" width="2" height="2" fill="#FFCAA0"/>
   </svg>
 );
 
@@ -53,7 +54,7 @@ const PixelElectricCar = ({ className = "" }) => (
 const PixelBeer = ({ className = "" }) => (
   <svg width="16" height="16" viewBox="0 0 16 16" className={className} style={{ imageRendering: 'pixelated' }}>
     {/* Mug body */}
-    <rect x="3" y="4" width="8" height="9" fill="#F4A261"/>
+    <rect x="3" y="4" width="8" height="9" fill="#FF8B6A"/>
     <rect x="4" y="5" width="6" height="7" fill="#E07A5F"/>
     {/* Beer foam */}
     <rect x="3" y="3" width="8" height="2" fill="#FFF8DC"/>
@@ -73,27 +74,27 @@ const mapStyles = [
   {
     featureType: 'water',
     elementType: 'geometry',
-    stylers: [{ color: '#6B9BD1' }, { lightness: 10 }]
+    stylers: [{ color: '#2a2a2a' }, { lightness: 10 }]
   },
   {
     featureType: 'landscape',
     elementType: 'geometry',
-    stylers: [{ color: '#F5F1E8' }]
+    stylers: [{ color: '#1a1a1a' }]
   },
   {
     featureType: 'road',
     elementType: 'geometry',
-    stylers: [{ color: '#FFFFFF' }]
+    stylers: [{ color: '#0a0a0a' }]
   },
   {
     featureType: 'road',
     elementType: 'geometry.stroke',
-    stylers: [{ color: '#D8D8D8' }]
+    stylers: [{ color: '#2a2a2a' }]
   },
   {
     featureType: 'road.highway',
     elementType: 'geometry',
-    stylers: [{ color: '#FFE8D6' }]
+    stylers: [{ color: '#3a3a3a' }]
   },
   {
     featureType: 'road.highway',
@@ -103,7 +104,7 @@ const mapStyles = [
   {
     featureType: 'poi.park',
     elementType: 'geometry',
-    stylers: [{ color: '#B8D4B8' }]
+    stylers: [{ color: '#3a3a3a' }]
   },
   {
     featureType: 'all',
@@ -113,7 +114,7 @@ const mapStyles = [
   {
     featureType: 'all',
     elementType: 'labels.text.stroke',
-    stylers: [{ color: '#FFFFFF' }, { weight: 3 }]
+    stylers: [{ color: '#0a0a0a' }, { weight: 3 }]
   }
 ];
 
@@ -131,10 +132,7 @@ const ShotgunAI = () => {
   const [currentView, setCurrentView] = useState('lobby'); // lobby, dashboard
 
   // Theme
-  const [darkMode, setDarkMode] = useState(false);
-
-  // User display name
-  const [userDisplayName, setUserDisplayName] = useState('');
+  const [darkMode, setDarkMode] = useState(true);
 
   // Firestore group management
   const [currentGroupId, setCurrentGroupId] = useState(null);
@@ -246,19 +244,6 @@ const ShotgunAI = () => {
     if (savedAchievements) setAchievements(JSON.parse(savedAchievements));
   }, []);
 
-  // Load user display name from localStorage
-  useEffect(() => {
-    if (user) {
-      const pendingName = localStorage.getItem('pendingDisplayName');
-      if (pendingName) {
-        setUserDisplayName(pendingName);
-        // Optionally clear it after using
-        // localStorage.removeItem('pendingDisplayName');
-      } else {
-        setUserDisplayName(user.displayName || user.email?.split('@')[0] || 'User');
-      }
-    }
-  }, [user]);
 
   // Initialize Firestore group for user
   useEffect(() => {
@@ -275,7 +260,7 @@ const ShotgunAI = () => {
         const activatedGroups = await groupService.activatePendingMember(
           user.email,
           user.uid,
-          userDisplayName || user.displayName
+          user.displayName || user.email.split('@')[0]
         );
 
         if (activatedGroups.length > 0) {
@@ -293,7 +278,7 @@ const ShotgunAI = () => {
             id: Date.now(),
             userId: user.uid,
             email: user.email,
-            name: userDisplayName || user.displayName || user.email.split('@')[0],
+            name: user.displayName || user.email.split('@')[0],
             vehicleType: 'gas',
             points: 0,
             tripCount: 0,
@@ -335,7 +320,7 @@ const ShotgunAI = () => {
     };
 
     initializeGroup();
-  }, [user, userDisplayName]);
+  }, [user]);
 
   // Load group data from Firestore
   const loadGroupData = async (groupId) => {
@@ -566,7 +551,7 @@ const ShotgunAI = () => {
       const newMember = {
         userId: user.uid,
         email: user.email,
-        name: userDisplayName || user.displayName || user.email.split('@')[0],
+        name: user.displayName || user.email.split('@')[0],
         vehicleType: 'gas',
         points: 0,
         tripCount: 0,
@@ -1128,7 +1113,7 @@ const ShotgunAI = () => {
           }
 
           .soft-gold {
-            color: #F4A261;
+            color: #FF8B6A;
           }
 
           /* Mesh Gradient Background */
@@ -1343,8 +1328,8 @@ const ShotgunAI = () => {
 
           .shadow-retro-teal {
             box-shadow:
-              8px 8px 0px 0px #2A9D8F,
-              0 0 30px rgba(42, 157, 143, 0.5),
+              8px 8px 0px 0px #FF8B6A,
+              0 0 30px rgba(255, 139, 106, 0.5),
               inset 0 1px 0 rgba(255, 255, 255, 0.3);
           }
 
@@ -1461,10 +1446,10 @@ const ShotgunAI = () => {
 
           .neon-teal {
             text-shadow:
-              0 0 5px #2A9D8F,
-              0 0 10px #2A9D8F,
-              0 0 20px #2A9D8F,
-              0 0 40px #2A9D8F;
+              0 0 5px #FF8B6A,
+              0 0 10px #FF8B6A,
+              0 0 20px #FF8B6A,
+              0 0 40px #FF8B6A;
             animation: neonPulse 2s infinite alternate;
           }
 
@@ -1585,7 +1570,7 @@ const ShotgunAI = () => {
               linear-gradient(90deg,
                 #FF6B4A 0%,
                 #E85D3C 25%,
-                #F4A261 50%,
+                #FF8B6A 50%,
                 #E85D3C 75%,
                 #FF6B4A 100%
               );
@@ -1625,7 +1610,7 @@ const ShotgunAI = () => {
 
           .glitch:hover::after {
             animation: glitch-2 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
-            color: #2A9D8F;
+            color: #FF8B6A;
             z-index: -2;
           }
 
@@ -1744,7 +1729,7 @@ const ShotgunAI = () => {
           .dark-mode-bg {
             background:
               linear-gradient(135deg, #1a1d2e 0%, #16213e 50%, #0f1419 100%),
-              radial-gradient(at 20% 30%, rgba(42, 157, 143, 0.15) 0px, transparent 50%),
+              radial-gradient(at 20% 30%, rgba(255, 107, 74, 0.15) 0px, transparent 50%),
               radial-gradient(at 80% 70%, rgba(224, 122, 95, 0.1) 0px, transparent 50%);
             position: relative;
           }
@@ -1799,7 +1784,7 @@ const ShotgunAI = () => {
           }
 
           a:focus-visible {
-            outline: 3px solid #2A9D8F;
+            outline: 3px solid #FF8B6A;
             outline-offset: 3px;
             border-radius: 2px;
           }
@@ -1877,13 +1862,19 @@ const ShotgunAI = () => {
 
       {/* LOBBY */}
       {currentView === 'lobby' && (
-        <div className={`mono-font transition-colors duration-300 ${darkMode ? 'dark-mode-bg text-white' : 'warm-cream-bg'}`}>
-          <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="max-w-2xl w-full">
+        <TVWrapper showThemeToggle={true} initialDarkMode={darkMode}>
+          {(isLightMode) => (
+            <div className="mono-font transition-colors duration-300 max-w-2xl w-full mx-auto" style={{
+              color: isLightMode ? '#3D405B' : '#FFFFFF'
+            }}>
               {/* Header */}
               <div className="text-center mb-8">
-                <h1 className="pixel-font text-7xl font-bold mb-2 neon-title glitch" data-text="SHOTGUN.AI" style={{
-                  letterSpacing: '0.1em'
+                <h1 className="pixel-font text-7xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
+                  letterSpacing: '0.1em',
+                  color: '#FF6B4A',
+                  textShadow: !isLightMode
+                    ? '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6), 0 0 30px rgba(255, 107, 74, 0.4)'
+                    : '2px 2px 0px rgba(224, 122, 95, 0.3)'
                 }}>
                   SHOTGUN.AI
                 </h1>
@@ -1906,11 +1897,14 @@ const ShotgunAI = () => {
               </div>
 
               {/* Setup Card */}
-              <div className={`rounded-lg punk-border shadow-retro-lg p-8 mb-6 card-float shine-effect ${
-                darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
-              }`}>
-                <h2 className="pixel-font text-4xl deep-forest mb-6" style={{
-                  textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
+              <div className="rounded-lg p-8 mb-6" style={{
+                background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : 'linear-gradient(to bottom right, #FFFFFF, #FDF8F3)',
+                border: !isLightMode ? '3px solid #FF6B4A' : '4px solid #3D405B',
+                boxShadow: !isLightMode ? '0 0 15px rgba(255, 107, 74, 0.3)' : '4px 4px 0px 0px #3D405B'
+              }}>
+                <h2 className="pixel-font text-4xl mb-6" style={{
+                  color: !isLightMode ? '#FF6B4A' : '#3D405B',
+                  textShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.6)' : '2px 2px 0px rgba(224, 122, 95, 0.2)'
                 }}>ADD MEMBERS</h2>
 
                 {/* Add Member Button */}
@@ -1923,11 +1917,13 @@ const ShotgunAI = () => {
 
                 {/* Member List */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold deep-forest mb-3 uppercase">Crew Members</h3>
-                  <div className={`space-y-2 max-h-64 overflow-y-auto p-4 border-4 rounded ${
-                    darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-[#3D405B]'
-                  }`} style={{
-                    boxShadow: darkMode ? 'none' : '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
+                  <h3 className="text-sm font-bold mb-3 uppercase" style={{
+                    color: !isLightMode ? '#FF8B6A' : '#3D405B'
+                  }}>Crew Members</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto p-4 rounded" style={{
+                    background: !isLightMode ? 'rgba(10, 10, 10, 0.8)' : '#FFFFFF',
+                    border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
+                    boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
                   }}>
                     {members.length === 0 ? (
                       <p className="text-center text-gray-500 italic py-8">No members yet. Add some above!</p>
@@ -1935,31 +1931,37 @@ const ShotgunAI = () => {
                       members.map((member, index) => (
                         <div
                           key={member.id}
-                          className={`flex items-center justify-between p-3 rounded border-2 group ${
-                            darkMode ? 'bg-gray-600 border-gray-500' : 'bg-[#FDF8F3] border-[#3D405B]'
-                          }`}
-                          style={{ animationDelay: `${index * 0.1}s` }}
+                          className="flex items-center justify-between p-3 rounded group"
+                          style={{
+                            background: !isLightMode ? 'rgba(30, 30, 30, 0.8)' : '#FDF8F3',
+                            border: !isLightMode ? '2px solid #FF8B6A' : '2px solid #3D405B',
+                            animationDelay: `${index * 0.1}s`
+                          }}
                         >
                           <div className="flex items-center gap-3">
                             <div className="relative">
                               {member.vehicleType === 'gas' ? (
                                 <Fuel size={24} className="pixel-icon text-[#E07A5F] group-hover:scale-110 transition-transform" />
                               ) : (
-                                <Zap size={24} className="pixel-icon text-yellow-500 group-hover:scale-110 transition-transform" />
+                                <Zap size={24} className="pixel-icon text-[#FFB088] group-hover:scale-110 transition-transform" />
                               )}
                               <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-20 blur-lg transition-opacity"></div>
                             </div>
-                            <span className="font-bold deep-forest group-hover:text-[#FF6B4A] transition-colors">
+                            <span className="font-bold transition-colors" style={{
+                              color: !isLightMode ? '#FFFFFF' : '#3D405B'
+                            }}>
                               {member.name}
                               {member.email?.toLowerCase() === user?.email?.toLowerCase() && (
-                                <span className="text-xs ml-2 text-gray-500">(You)</span>
+                                <span className="text-xs ml-2" style={{
+                                  color: !isLightMode ? '#888' : '#666'
+                                }}>(You)</span>
                               )}
                             </span>
                           </div>
                           {member.email?.toLowerCase() !== user?.email?.toLowerCase() && (
                             <button
                               onClick={() => removeMember(member.id)}
-                              className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded transition-all hover:scale-110"
+                              className="text-[#FF6B4A] hover:text-[#E85D3C] p-2 hover:bg-[#2a2a2a] rounded transition-all hover:scale-110"
                               aria-label={`Remove ${member.name} from crew`}
                             >
                               <UserMinus size={18} className="pixel-icon" />
@@ -1973,19 +1975,32 @@ const ShotgunAI = () => {
 
                 {/* City Selection */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-bold deep-forest mb-3 uppercase">Select Default City</h3>
+                  <h3 className="text-sm font-bold mb-3 uppercase" style={{
+                    color: !isLightMode ? '#FF8B6A' : '#3D405B'
+                  }}>Select Default City</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {predefinedCities.map(city => (
                       <button
                         key={city.name}
                         onClick={() => setDefaultCity(city)}
-                        className={`p-3 rounded-lg border-2 transition-all font-bold ${
-                          defaultCity?.name === city.name
-                            ? 'bg-[#E07A5F] text-white border-[#3D405B]'
-                            : darkMode
-                              ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-white'
-                              : 'bg-white border-[#3D405B] hover:bg-[#FDF8F3] text-[#3D405B]'
-                        }`}
+                        className="p-3 rounded-lg transition-all font-bold"
+                        style={{
+                          background: defaultCity?.name === city.name
+                            ? '#E07A5F'
+                            : !isLightMode
+                              ? 'rgba(30, 30, 30, 0.8)'
+                              : '#FFFFFF',
+                          color: defaultCity?.name === city.name
+                            ? '#FFFFFF'
+                            : !isLightMode
+                              ? '#FFFFFF'
+                              : '#3D405B',
+                          border: defaultCity?.name === city.name
+                            ? '2px solid #3D405B'
+                            : !isLightMode
+                              ? '2px solid #FF8B6A'
+                              : '2px solid #3D405B'
+                        }}
                       >
                         {city.name}
                       </button>
@@ -1996,7 +2011,9 @@ const ShotgunAI = () => {
                 {/* Group Name Display */}
                 {groupName && (
                   <div className="mb-4 text-center">
-                    <p className="mono-font text-sm text-gray-600">
+                    <p className="mono-font text-sm" style={{
+                      color: !isLightMode ? '#AAA' : '#666'
+                    }}>
                       Current Group: <span className="font-bold text-[#FF6B4A]">{groupName}</span>
                     </p>
                   </div>
@@ -2020,7 +2037,7 @@ const ShotgunAI = () => {
                   </button>
                 </div>
                 {!defaultCity && (
-                  <p className="text-center text-red-500 text-sm">
+                  <p className="text-center text-[#FF6B4A] text-sm">
                     Please select a default city to continue
                   </p>
                 )}
@@ -2030,9 +2047,9 @@ const ShotgunAI = () => {
                   <div className="mt-6">
                     <h3 className="text-sm font-bold deep-forest mb-3 uppercase">Saved Groups</h3>
                     <div className={`space-y-2 max-h-40 overflow-y-auto p-4 border-4 rounded ${
-                      darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-[#3D405B]'
+                      !isLightMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-[#3D405B]'
                     }`} style={{
-                      boxShadow: darkMode ? 'none' : '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
+                      boxShadow: !isLightMode ? 'none' : '4px 4px 0px 0px #3D405B, inset 0 2px 4px rgba(0, 0, 0, 0.05)'
                     }}>
                       {savedGroups.map((group) => (
                         <div
@@ -2040,7 +2057,7 @@ const ShotgunAI = () => {
                           className={`flex items-center justify-between p-3 rounded border-2 transition-all ${
                             groupName === group
                               ? 'bg-[#FF6B4A] border-[#3D405B]'
-                              : darkMode
+                              : !isLightMode
                                 ? 'bg-gray-600 border-gray-500 hover:border-gray-400'
                                 : 'bg-[#FDF8F3] border-[#3D405B] hover:border-[#FF6B4A]'
                           }`}
@@ -2048,7 +2065,7 @@ const ShotgunAI = () => {
                           <button
                             onClick={() => loadGroup(group)}
                             className={`flex-1 text-left mono-font font-bold ${
-                              groupName === group ? 'text-white' : darkMode ? 'text-white' : 'text-[#3D405B]'
+                              groupName === group ? 'text-white' : !isLightMode ? 'text-white' : 'text-[#3D405B]'
                             }`}
                           >
                             {group}
@@ -2060,8 +2077,8 @@ const ShotgunAI = () => {
                             }}
                             className={`ml-2 p-2 rounded transition-all hover:scale-110 ${
                               groupName === group
-                                ? 'text-white hover:bg-red-600'
-                                : 'text-red-500 hover:bg-red-50'
+                                ? 'text-white hover:bg-[#D84315]'
+                                : 'text-[#FF6B4A] hover:bg-[#2a2a2a]'
                             }`}
                             aria-label={`Delete group ${group}`}
                           >
@@ -2074,37 +2091,51 @@ const ShotgunAI = () => {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </TVWrapper>
       )}
 
       {/* DASHBOARD */}
       {currentView === 'dashboard' && (
-        <div className={`mono-font transition-colors duration-300 ${darkMode ? 'dark-mode-bg text-white' : 'warm-cream-bg'}`}>
-          <div className="min-h-screen p-4 md:p-8">
-            <div className="max-w-7xl mx-auto">
+        <TVWrapper showThemeToggle={true} initialDarkMode={darkMode}>
+          {(isLightMode) => (
+            <div className="mono-font transition-colors duration-300 max-w-7xl mx-auto" style={{
+              color: isLightMode ? '#3D405B' : '#FFFFFF'
+            }}>
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
-                <h1 className="pixel-font text-5xl md:text-7xl neon-title glitch" data-text="SHOTGUN.AI" style={{
-                  letterSpacing: '0.1em'
+                <h1 className="pixel-font text-5xl md:text-7xl glitch" data-text="SHOTGUN.AI" style={{
+                  letterSpacing: '0.1em',
+                  color: '#FF6B4A',
+                  textShadow: !isLightMode
+                    ? '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6)'
+                    : '2px 2px 0px rgba(224, 122, 95, 0.3)'
                 }}>
                   SHOTGUN.AI
                 </h1>
                 <div className="flex items-center gap-2">
                   {user && (
-                    <div className={`px-3 py-2 border-4 border-[#3D405B] shadow-retro ${
-                      darkMode ? 'bg-gray-800' : 'bg-white'
-                    }`}>
-                      <p className="text-xs font-bold deep-forest truncate max-w-[150px] mono-font">
-                        {userDisplayName || user.displayName || user.email}
+                    <div className="px-3 py-2" style={{
+                      background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : '#FFFFFF',
+                      border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
+                      boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '4px 4px 0px 0px #3D405B'
+                    }}>
+                      <p className="text-xs font-bold truncate max-w-[150px] mono-font" style={{
+                        color: !isLightMode ? '#FF8B6A' : '#3D405B'
+                      }}>
+                        {user.displayName || user.email}
                       </p>
                     </div>
                   )}
                   <div className="tooltip">
                     <button
-                      className={`p-3 border-4 border-[#3D405B] shadow-retro transition-all ${
-                        darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-700'
-                      }`}
+                      className="p-3 transition-all"
+                      style={{
+                        background: !isLightMode ? 'rgba(40, 20, 10, 0.8)' : '#2a2a2a',
+                        color: !isLightMode ? '#FF8B6A' : '#FF6B4A',
+                        border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
+                        boxShadow: !isLightMode ? '0 0 10px rgba(134, 239, 172, 0.2)' : '4px 4px 0px 0px #3D405B'
+                      }}
                     >
                       <Check size={20} className="pixel-icon" />
                     </button>
@@ -2114,26 +2145,27 @@ const ShotgunAI = () => {
                     </span>
                   </div>
                   <button
-                    onClick={() => setDarkMode(!darkMode)}
-                    className={`p-3 border-4 border-[#3D405B] shadow-retro transition-all ${
-                      darkMode ? 'bg-gray-800 text-yellow-400' : 'bg-white text-gray-700'
-                    }`}
-                    aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                  >
-                    {darkMode ? <Sun size={20} className="pixel-icon" /> : <Moon size={20} className="pixel-icon" />}
-                  </button>
-                  <button
                     onClick={() => setCurrentView('lobby')}
-                    className="p-3 border-4 border-[#3D405B] bg-white text-[#3D405B] shadow-retro transition-all"
+                    className="p-3 transition-all"
+                    style={{
+                      background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : '#FFFFFF',
+                      color: !isLightMode ? '#FF8B6A' : '#3D405B',
+                      border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
+                      boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '4px 4px 0px 0px #3D405B'
+                    }}
                     aria-label="Go to settings"
                   >
                     <Settings size={20} className="pixel-icon" />
                   </button>
                   <button
                     onClick={logout}
-                    className={`p-3 border-4 border-[#3D405B] shadow-retro transition-all ${
-                      darkMode ? 'bg-red-900 text-red-300' : 'bg-red-100 text-red-700'
-                    }`}
+                    className="p-3 transition-all"
+                    style={{
+                      background: !isLightMode ? 'rgba(100, 20, 20, 0.8)' : '#2a2a2a',
+                      color: !isLightMode ? '#FF8B6A' : '#D84315',
+                      border: !isLightMode ? '2px solid #DC2626' : '4px solid #3D405B',
+                      boxShadow: !isLightMode ? '0 0 10px rgba(220, 38, 38, 0.3)' : '4px 4px 0px 0px #3D405B'
+                    }}
                     aria-label="Logout"
                   >
                     <LogOut size={20} className="pixel-icon" />
@@ -2144,10 +2176,17 @@ const ShotgunAI = () => {
               {/* Main Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Leaderboard Card */}
-                <div className={`rounded-lg punk-border shadow-retro-lg overflow-hidden flex flex-col stagger-1 ${
-                  darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[#3D405B]'
-                }`}>
-                  <div className="bg-gradient-to-r from-[#E07A5F] to-[#F4A261] p-4 border-b-4 border-[#3D405B]">
+                <div className="rounded-lg overflow-hidden flex flex-col stagger-1" style={{
+                  background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : '#FFFFFF',
+                  border: !isLightMode ? '3px solid #FF6B4A' : '4px solid #3D405B',
+                  boxShadow: !isLightMode ? '0 0 15px rgba(255, 107, 74, 0.3)' : '4px 4px 0px 0px #3D405B'
+                }}>
+                  <div className="p-4" style={{
+                    background: darkMode
+                      ? 'linear-gradient(to right, rgba(224, 122, 95, 0.3), rgba(244, 162, 97, 0.3))'
+                      : 'linear-gradient(to right, #E07A5F, #FF8B6A)',
+                    borderBottom: !isLightMode ? '2px solid #FF6B4A' : '4px solid #3D405B'
+                  }}>
                     <div className="flex items-center justify-between">
                       <h2 className="pixel-font text-3xl text-white flex items-center gap-2">
                         <Crown className="pixel-icon" />
@@ -2171,7 +2210,9 @@ const ShotgunAI = () => {
 
                   <div className="p-6 flex-1">
                     {members.length === 0 ? (
-                      <p className={`text-center py-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <p className="text-center py-8" style={{
+                        color: !isLightMode ? '#888' : '#666'
+                      }}>
                         No members yet
                       </p>
                     ) : (
@@ -2186,16 +2227,20 @@ const ShotgunAI = () => {
                               <div key={member.id} className="space-y-2">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
-                                    <span className="text-2xl font-bold deep-forest">
+                                    <span className="text-2xl font-bold" style={{
+                                      color: !isLightMode ? '#FF8B6A' : '#3D405B'
+                                    }}>
                                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                                     </span>
                                     <div>
                                       <div className="flex items-center gap-2">
-                                        <span className="font-bold deep-forest">{member.name}</span>
+                                        <span className="font-bold" style={{
+                                          color: !isLightMode ? '#FF8B6A' : '#3D405B'
+                                        }}>{member.name}</span>
                                         {member.vehicleType === 'gas' ? (
                                           <Fuel size={18} className="pixel-icon text-[#E07A5F]" />
                                         ) : (
-                                          <Zap size={18} className="pixel-icon text-yellow-500" />
+                                          <Zap size={18} className="pixel-icon text-[#FFB088]" />
                                         )}
                                         {member.ddCount > 0 && (
                                           <div className="flex items-center gap-0.5">
@@ -2205,14 +2250,20 @@ const ShotgunAI = () => {
                                           </div>
                                         )}
                                       </div>
-                                      <div className="text-xs text-gray-500">
+                                      <div className="text-xs" style={{
+                                        color: !isLightMode ? '#888' : '#666'
+                                      }}>
                                         {member.tripCount} trips • {member.milesDriven.toFixed(1)} mi
                                       </div>
                                     </div>
                                   </div>
                                   <div className="text-right">
-                                    <div className="font-bold text-lg soft-gold">{member.points.toFixed(1)}</div>
-                                    <div className="text-xs text-gray-500">points</div>
+                                    <div className="font-bold text-lg" style={{
+                                      color: !isLightMode ? '#FFB088' : '#FF8B6A'
+                                    }}>{member.points.toFixed(1)}</div>
+                                    <div className="text-xs" style={{
+                                      color: !isLightMode ? '#888' : '#666'
+                                    }}>points</div>
                                   </div>
                                 </div>
 
@@ -2238,13 +2289,15 @@ const ShotgunAI = () => {
                   </div>
 
                   {/* Group Stats Button */}
-                  <div className="p-4 border-t-4 border-[#3D405B]">
+                  <div className="p-4" style={{
+                    borderTop: !isLightMode ? '2px solid #FF6B4A' : '4px solid #3D405B'
+                  }}>
                     <button
                       onClick={() => setShowStatsCard(true)}
                       disabled={trips.length === 0}
                       className="pixel-button-secondary w-full py-3 text-white pixel-font text-lg rounded-lg flex items-center justify-center gap-3 transition-all"
                       style={{
-                        boxShadow: '6px 6px 0px #3D405B'
+                        boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.3)' : '6px 6px 0px #3D405B'
                       }}
                     >
                       <BarChart3 size={20} className="pixel-icon" />
@@ -2255,10 +2308,17 @@ const ShotgunAI = () => {
                 </div>
 
                 {/* Trip History Card */}
-                <div className={`rounded-lg punk-border shadow-retro-lg overflow-hidden flex flex-col stagger-2 ${
-                  darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B]'
-                }`}>
-                  <div className="bg-gradient-to-r from-[#2A9D8F] to-[#238276] p-4 border-b-4 border-[#3D405B]">
+                <div className="rounded-lg overflow-hidden flex flex-col stagger-2" style={{
+                  background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : 'linear-gradient(to bottom right, #FFFFFF, #FDF8F3)',
+                  border: !isLightMode ? '3px solid #FF6B4A' : '4px solid #3D405B',
+                  boxShadow: !isLightMode ? '0 0 15px rgba(255, 107, 74, 0.3)' : '4px 4px 0px 0px #3D405B'
+                }}>
+                  <div className="p-4" style={{
+                    background: darkMode
+                      ? 'linear-gradient(to right, rgba(224, 122, 95, 0.3), rgba(244, 162, 97, 0.3))'
+                      : 'linear-gradient(to right, #E07A5F, #FF8B6A)',
+                    borderBottom: !isLightMode ? '2px solid #FF6B4A' : '4px solid #3D405B'
+                  }}>
                     <div className="flex items-center justify-between">
                       <h2 className="pixel-font text-3xl text-white flex items-center gap-2">
                         <History className="pixel-icon" />
@@ -2266,7 +2326,12 @@ const ShotgunAI = () => {
                       </h2>
                       <button
                         onClick={() => setShowTripModal(true)}
-                        className="bg-white text-[#2A9D8F] px-4 py-2 rounded-lg font-bold border-2 border-[#3D405B] hover:bg-[#FDF8F3] transition-all flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2"
+                        style={{
+                          background: !isLightMode ? 'rgba(255, 139, 106, 0.3)' : '#FFFFFF',
+                          color: !isLightMode ? '#FFA07A' : '#FF8B6A',
+                          border: !isLightMode ? '2px solid #FFA07A' : '2px solid #3D405B'
+                        }}
                       >
                         <Plus size={18} className="pixel-icon" />
                         NEW
@@ -2279,16 +2344,16 @@ const ShotgunAI = () => {
                       {trips.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 px-4">
                           <div className="text-center mb-8">
-                            <p className={`pixel-font text-4xl mb-3 ${darkMode ? 'text-white' : ''}`} style={{
-                              color: darkMode ? '#FFFFFF' : '#3D405B',
-                              textShadow: darkMode ? '2px 2px 0px rgba(42, 157, 143, 0.3)' : '2px 2px 0px rgba(224, 122, 95, 0.2)'
+                            <p className={`pixel-font text-4xl mb-3 ${!isLightMode ? 'text-white' : ''}`} style={{
+                              color: !isLightMode ? '#FFFFFF' : '#3D405B',
+                              textShadow: !isLightMode ? '2px 2px 0px rgba(255, 139, 106, 0.3)' : '2px 2px 0px rgba(224, 122, 95, 0.2)'
                             }}>
                               NO TRIPS YET!
                             </p>
-                            <p className={`mono-font text-sm mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <p className={`mono-font text-sm mb-2 ${!isLightMode ? 'text-gray-300' : 'text-gray-600'}`}>
                               Time to hit the road 🚗💨
                             </p>
-                            <p className={`mono-font text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <p className={`mono-font text-xs ${!isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               Start tracking your carpools and earn points!
                             </p>
                           </div>
@@ -2304,29 +2369,34 @@ const ShotgunAI = () => {
                         trips.map((trip, index) => (
                           <div
                             key={trip.id}
-                            className={`p-4 rounded-lg border-4 group ${
-                              darkMode
-                                ? 'bg-gray-800 border-gray-600 shadow-retro-teal'
-                                : 'bg-white border-[#3D405B] shadow-retro'
-                            }`}
-                            style={{ animationDelay: `${index * 0.05}s` }}
+                            className="p-4 rounded-lg group"
+                            style={{
+                              background: !isLightMode ? 'rgba(30, 30, 30, 0.8)' : '#FFFFFF',
+                              border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
+                              boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '4px 4px 0px 0px #3D405B',
+                              animationDelay: `${index * 0.05}s`
+                            }}
                           >
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-bold deep-forest group-hover:text-[#FF6B4A] transition-colors">{trip.driver}</span>
+                                  <span className="font-bold transition-colors" style={{
+                                    color: !isLightMode ? '#FFFFFF' : '#3D405B'
+                                  }}>{trip.driver}</span>
                                   {trip.isDD && (
                                     <span className="badge bg-purple-100 text-purple-700 border-purple-300 group-hover:scale-110 transition-transform">
                                       🍺 DD
                                     </span>
                                   )}
                                   {trip.isRoundTrip && (
-                                    <span className="badge bg-blue-100 text-blue-700 border-blue-300 group-hover:scale-110 transition-transform">
+                                    <span className="badge bg-[#333] text-[#FF6B4A] border-[#FF8B6A] group-hover:scale-110 transition-transform">
                                       🔄 Round Trip
                                     </span>
                                   )}
                                 </div>
-                                <div className={`text-xs mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <div className="text-xs mb-2" style={{
+                                  color: !isLightMode ? '#AAA' : '#666'
+                                }}>
                                   <div className="flex items-center gap-1">
                                     <MapPin size={12} className="pixel-icon" />
                                     {trip.from}
@@ -2336,28 +2406,30 @@ const ShotgunAI = () => {
                                     {trip.to}
                                   </div>
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs" style={{
+                                  color: !isLightMode ? '#888' : '#666'
+                                }}>
                                   {trip.distance} mi • {trip.passengerCount} passenger{trip.passengerCount !== 1 ? 's' : ''} • +{(trip.driverPoints || trip.points || 0).toFixed(1)} pts (driver)
                                 </div>
                               </div>
                               <div className="flex items-center gap-1">
                                 <button
                                   onClick={() => editTrip(trip)}
-                                  className="p-2 text-blue-500 hover:bg-blue-50 rounded transition-all hover:scale-110 border-2 border-transparent hover:border-blue-300"
+                                  className="p-2 text-[#FF8B6A] hover:bg-[#2a2a2a] rounded transition-all hover:scale-110 border-2 border-transparent hover:border-[#FF8B6A]"
                                   aria-label="Edit trip"
                                 >
                                   <Edit2 size={14} className="pixel-icon" />
                                 </button>
                                 <button
                                   onClick={() => setShowDeleteConfirm(trip.id)}
-                                  className="p-2 text-red-500 hover:bg-red-50 rounded transition-all hover:scale-110 border-2 border-transparent hover:border-red-300"
+                                  className="p-2 text-[#FF6B4A] hover:bg-[#2a2a2a] rounded transition-all hover:scale-110 border-2 border-transparent hover:border-[#FF8B6A]"
                                   aria-label="Delete trip"
                                 >
                                   <Trash2 size={14} className="pixel-icon" />
                                 </button>
                               </div>
                             </div>
-                            <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                            <div className={`text-xs ${!isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
                               {new Date(trip.timestamp).toLocaleString()}
                             </div>
                           </div>
@@ -2368,7 +2440,7 @@ const ShotgunAI = () => {
 
                   {/* Export Data Button - Sticky at Bottom */}
                   <div className={`p-4 border-t-2 border-[#3D405B] ${
-                    darkMode ? 'bg-gray-900' : 'bg-[#FDF8F3]'
+                    !isLightMode ? 'bg-gray-900' : 'bg-[#FDF8F3]'
                   }`}>
                     <button
                       onClick={exportToCSV}
@@ -2408,7 +2480,7 @@ const ShotgunAI = () => {
                     : 'bg-gradient-to-r from-[#3D405B] to-[#2A2C3E]'
                 }`}>
                   <h2 className={`pixel-font text-3xl flex items-center gap-2 ${
-                    darkMode ? 'text-[#2A9D8F] neon-teal' : 'text-[#2A9D8F]'
+                    !isLightMode ? 'text-[#FF8B6A] neon-teal' : 'text-[#FF8B6A]'
                   }`}>
                     <MapPin className="pixel-icon" />
                     TRIP MAP
@@ -2426,7 +2498,7 @@ const ShotgunAI = () => {
                         value={selectedTripForMap}
                         onChange={(e) => setSelectedTripForMap(e.target.value)}
                         className={`retro-input w-full px-3 py-2 rounded text-sm font-bold ${
-                          darkMode ? 'bg-gray-800 text-white border-gray-600' : 'text-[#3D405B]'
+                          !isLightMode ? 'bg-gray-800 text-white border-gray-600' : 'text-[#3D405B]'
                         }`}
                       >
                         <option value="all">🗺️ All Trips (Last 10)</option>
@@ -2491,7 +2563,7 @@ const ShotgunAI = () => {
                           options={{
                             polylineOptions: {
                               strokeColor: selectedTripForMap === 'all'
-                                ? ['#E07A5F', '#F4A261', '#2A9D8F', '#3D405B'][index % 4]
+                                ? ['#E07A5F', '#FF8B6A', '#FF8B6A', '#3D405B'][index % 4]
                                 : '#E07A5F',
                               strokeWeight: selectedTripForMap === 'all' ? 4 : 6,
                               strokeOpacity: selectedTripForMap === 'all' ? 0.7 : 0.9,
@@ -2509,22 +2581,22 @@ const ShotgunAI = () => {
               <div className="mt-6 mb-24 text-center">
                 <button
                   onClick={resetAllData}
-                  className="text-red-500 hover:text-red-700 text-sm flex items-center gap-2 mx-auto"
+                  className="text-[#FF6B4A] hover:text-[#E85D3C] text-sm flex items-center gap-2 mx-auto"
                 >
                   <RotateCcw size={14} className="pixel-icon" />
                   Reset All Data
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </TVWrapper>
       )}
 
       {/* LOG/EDIT TRIP MODAL */}
       {showTripModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#2A9D8F] max-w-2xl w-full slide-up shadow-retro-lg max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-[#2A9D8F] to-[#238276] p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between sticky top-0 z-10">
+          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF8B6A] max-w-2xl w-full slide-up shadow-retro-lg max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-[#FF8B6A] to-[#FF8B6A] p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between sticky top-0 z-10">
               <h2 className="pixel-font text-3xl text-white">
                 {editingTrip ? 'EDIT TRIP' : 'LOG NEW TRIP'}
               </h2>
@@ -2667,7 +2739,7 @@ const ShotgunAI = () => {
                           {member.vehicleType === 'gas' ? (
                             <Fuel size={18} className="pixel-icon text-[#E07A5F]" />
                           ) : (
-                            <Zap size={18} className="pixel-icon text-yellow-500" />
+                            <Zap size={18} className="pixel-icon text-[#FFB088]" />
                           )}
                         </label>
                       ))
@@ -2696,7 +2768,7 @@ const ShotgunAI = () => {
                 </div>
 
                 {/* Round Trip Toggle */}
-                <div className="flex items-center gap-3 p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                <div className="flex items-center gap-3 p-4 bg-[#2a2a2a] border-2 border-[#FF8B6A] rounded-lg">
                   <input
                     type="checkbox"
                     id="roundtrip-toggle"
@@ -2709,7 +2781,7 @@ const ShotgunAI = () => {
                     className="font-bold deep-forest cursor-pointer flex items-center gap-2 mono-font text-sm"
                   >
                     Round Trip (2x)
-                    <RotateCcw className="text-[#2A9D8F] pixel-icon" size={18} />
+                    <RotateCcw className="text-[#FF8B6A] pixel-icon" size={18} />
                   </label>
                 </div>
               </div>
@@ -2739,11 +2811,11 @@ const ShotgunAI = () => {
       {/* SLOT MACHINE MODAL */}
       {showSlotMachine && (
         <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#F4A261] max-w-md w-full slide-up shine-effect" style={{
-            boxShadow: '12px 12px 0px #F4A261, 0 0 60px rgba(244, 162, 97, 0.8)'
+          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF8B6A] max-w-md w-full slide-up shine-effect" style={{
+            boxShadow: '12px 12px 0px #FF8B6A, 0 0 60px rgba(244, 162, 97, 0.8)'
           }}>
-            <div className="bg-gradient-to-r from-[#3D405B] to-[#2A2C3E] p-4 rounded-t-lg border-b-4 border-[#F4A261]">
-              <h2 className="pixel-font text-3xl text-[#F4A261] text-center glitch" data-text="🎰 COMPUTING..." style={{
+            <div className="bg-gradient-to-r from-[#3D405B] to-[#2A2C3E] p-4 rounded-t-lg border-b-4 border-[#FF8B6A]">
+              <h2 className="pixel-font text-3xl text-[#FF8B6A] text-center glitch" data-text="🎰 COMPUTING..." style={{
                 textShadow: '0 0 20px rgba(244, 162, 97, 0.8)'
               }}>
                 🎰 COMPUTING...
@@ -2751,7 +2823,7 @@ const ShotgunAI = () => {
             </div>
 
             <div className="p-8 text-center">
-              <div className={`bg-gradient-to-br from-[#FF6B4A] to-[#F4A261] p-8 rounded-lg border-4 border-[#3D405B] mb-6 ${slotMachineSpinning ? 'slot-spinning' : ''}`} style={{
+              <div className={`bg-gradient-to-br from-[#FF6B4A] to-[#FF8B6A] p-8 rounded-lg border-4 border-[#3D405B] mb-6 ${slotMachineSpinning ? 'slot-spinning' : ''}`} style={{
                 boxShadow: slotMachineSpinning
                   ? '6px 6px 0px #3D405B, 0 0 40px rgba(255, 107, 74, 0.8)'
                   : '6px 6px 0px #3D405B, 0 0 60px rgba(255, 107, 74, 1), 0 0 100px rgba(244, 162, 97, 0.6)'
@@ -2792,7 +2864,7 @@ const ShotgunAI = () => {
       {/* DELETE CONFIRMATION DIALOG */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-red-500 max-w-sm w-full slide-up shadow-retro-lg">
+          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF6B4A] max-w-sm w-full slide-up shadow-retro-lg">
             <div className="bg-gradient-to-r from-red-500 to-red-600 p-4 rounded-t-lg border-b-4 border-[#3D405B]">
               <h2 className="pixel-font text-2xl text-white flex items-center gap-2">
                 <AlertCircle className="pixel-icon" />
@@ -2808,7 +2880,7 @@ const ShotgunAI = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => deleteTrip(showDeleteConfirm)}
-                  className="flex-1 py-2 bg-red-500 text-white rounded hover:bg-red-600 font-bold"
+                  className="flex-1 py-2 bg-[#2a2a2a]0 text-white rounded hover:bg-[#D84315] font-bold"
                 >
                   DELETE
                 </button>
@@ -2884,10 +2956,10 @@ const ShotgunAI = () => {
       {/* DELETE GROUP CONFIRMATION */}
       {groupToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-red-500 max-w-md w-full slide-up" style={{
+          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF6B4A] max-w-md w-full slide-up" style={{
             boxShadow: '12px 12px 0px red, 0 0 60px rgba(239, 68, 68, 0.8)'
           }}>
-            <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 rounded-t-lg border-b-4 border-red-800">
+            <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 rounded-t-lg border-b-4 border-[#D84315]">
               <h2 className="pixel-font text-3xl text-white text-center" style={{
                 textShadow: '2px 2px 0px rgba(0, 0, 0, 0.3)'
               }}>
@@ -2909,7 +2981,7 @@ const ShotgunAI = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => deleteGroup(groupToDelete)}
-                  className="flex-1 py-3 bg-red-500 text-white rounded-lg font-bold pixel-font text-xl hover:bg-red-600 transition-all border-4 border-[#3D405B]"
+                  className="flex-1 py-3 bg-[#2a2a2a]0 text-white rounded-lg font-bold pixel-font text-xl hover:bg-[#D84315] transition-all border-4 border-[#3D405B]"
                   style={{
                     boxShadow: '4px 4px 0px #3D405B'
                   }}
@@ -2931,8 +3003,8 @@ const ShotgunAI = () => {
       {/* GROUP STATISTICS MODAL */}
       {showStatsCard && trips.length > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#2A9D8F] max-w-lg w-full slide-up shadow-retro-lg">
-            <div className="bg-gradient-to-r from-[#2A9D8F] to-[#238276] p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between">
+          <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF8B6A] max-w-lg w-full slide-up shadow-retro-lg">
+            <div className="bg-gradient-to-r from-[#FF8B6A] to-[#FF8B6A] p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between">
               <h2 className="pixel-font text-3xl text-white flex items-center gap-2">
                 <BarChart3 className="pixel-icon" />
                 GROUP STATS
@@ -2965,12 +3037,12 @@ const ShotgunAI = () => {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border-2 border-green-300">
-                    <p className="text-sm font-bold text-green-800 mb-2">🌍 ENVIRONMENTAL IMPACT</p>
-                    <p className="text-xs text-green-700">
+                  <div className="bg-gradient-to-r from-[#2a2a2a] to-[#333] p-4 rounded-lg border-2 border-[#FF8B6A]">
+                    <p className="text-sm font-bold text-[#FF6B4A] mb-2">🌍 ENVIRONMENTAL IMPACT</p>
+                    <p className="text-xs text-[#FF8B6A]">
                       CO₂ Saved: <span className="font-bold">{stats.co2SavedKg} kg</span>
                     </p>
-                    <p className="text-xs text-green-700">
+                    <p className="text-xs text-[#FF8B6A]">
                       Money Saved: <span className="font-bold">${stats.moneySaved}</span>
                     </p>
                   </div>
@@ -2994,7 +3066,7 @@ const ShotgunAI = () => {
         .map((achievement, index) => (
           <div
             key={achievement.id}
-            className="fixed right-4 bg-gradient-to-r from-[#F4A261] to-[#E07A5F] text-white p-4 rounded-lg border-4 border-[#3D405B] shadow-retro-lg slide-up max-w-sm z-50"
+            className="fixed right-4 bg-gradient-to-r from-[#FF8B6A] to-[#E07A5F] text-white p-4 rounded-lg border-4 border-[#3D405B] shadow-retro-lg slide-up max-w-sm z-50"
             style={{ top: `${80 + index * 100}px` }}
           >
             <button
@@ -3022,6 +3094,8 @@ const ShotgunAI = () => {
         groupId={currentGroupId}
         groupName={groupName}
         currentMembers={members}
+        onMemberAdded={loadGroupData}
+        inviterEmail={user?.email}
       />
     </>
   );

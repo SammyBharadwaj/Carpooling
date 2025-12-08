@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Users, Car, Check, X, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { inviteService, groupService } from '../services/firestoreService';
+import TVWrapper from './TVWrapper';
 
 const AcceptInvite = () => {
   const { inviteId } = useParams();
@@ -19,6 +20,13 @@ const AcceptInvite = () => {
     loadInviteData();
   }, [inviteId]);
 
+  // Auto-accept invite when user is signed in
+  useEffect(() => {
+    if (user && invite && !accepting) {
+      handleAcceptInvite();
+    }
+  }, [user, invite]);
+
   const loadInviteData = async () => {
     try {
       setLoading(true);
@@ -29,11 +37,6 @@ const AcceptInvite = () => {
 
       if (!inviteData) {
         setError('This invite link is invalid or has expired.');
-        return;
-      }
-
-      if (inviteData.used) {
-        setError('This invite link has already been used.');
         return;
       }
 
@@ -70,14 +73,28 @@ const AcceptInvite = () => {
       setAccepting(true);
       setError('');
 
+      // Get group data first to check if user is already a member
+      const groupData = await groupService.getGroup(invite.groupId);
+
+      // Check if user is already in the group
+      const isAlreadyMember = groupData.members?.some(
+        member => member.userId === user.uid || member.email?.toLowerCase() === user.email.toLowerCase()
+      );
+
+      if (isAlreadyMember) {
+        // User is already in the group, just redirect to dashboard
+        localStorage.setItem('activeGroupId', invite.groupId);
+        navigate('/', { state: { joinedGroup: group.name } });
+        return;
+      }
+
       // Get member details from invite document (stored in Firestore)
       const memberData = invite.memberData || {};
 
       // Add user to group
       await groupService.addMemberToGroup(invite.groupId, user.uid);
 
-      // Update group with new member data
-      const groupData = await groupService.getGroup(invite.groupId);
+      // Create new member object
       const newMember = {
         userId: user.uid,
         email: user.email,
@@ -91,11 +108,9 @@ const AcceptInvite = () => {
         joinedAt: new Date().toISOString()
       };
 
+      // Update group with new member data
       const updatedMembers = [...(groupData.members || []), newMember];
       await groupService.updateGroup(invite.groupId, { members: updatedMembers });
-
-      // Mark invite as used
-      await inviteService.markInviteUsed(inviteId);
 
       // Store the new groupId in user's active groups
       const activeGroupId = localStorage.getItem('activeGroupId');
@@ -120,46 +135,115 @@ const AcceptInvite = () => {
 
   if (loading) {
     return (
-      <div className="mono-font warm-cream-bg min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="pixel-font text-4xl deep-forest mb-4">LOADING...</div>
-          <p className="mono-font text-gray-600">Fetching invitation details</p>
-        </div>
-      </div>
+      <TVWrapper showThemeToggle={true} initialDarkMode={true}>
+        {(isLightMode) => (
+          <div className="mono-font text-center">
+            <div className="pixel-font text-4xl mb-4" style={{
+              color: '#FF6B4A',
+              textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
+            }}>LOADING...</div>
+            <p className="mono-font" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>Fetching invitation details</p>
+          </div>
+        )}
+      </TVWrapper>
     );
   }
 
   if (error) {
     return (
-      <div className="mono-font warm-cream-bg min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="punk-border shadow-retro-lg p-8 bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B] rounded-lg">
-            <div className="text-center mb-6">
-              <X size={48} className="mx-auto text-red-500 mb-4" />
-              <h2 className="pixel-font text-3xl deep-forest mb-4">
-                INVITE ERROR
-              </h2>
-              <p className="mono-font text-gray-600">{error}</p>
+      <TVWrapper showThemeToggle={true} initialDarkMode={true}>
+        {(isLightMode) => (
+          <div className="mono-font max-w-md w-full mx-auto">
+            <div className="p-8 rounded-lg" style={{
+              background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
+              border: '3px solid #FF6B4A',
+              boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
+            }}>
+              <div className="text-center mb-6">
+                <X size={48} className="mx-auto mb-4" style={{
+                  color: '#ff4444',
+                  filter: 'drop-shadow(0 0 10px rgba(255, 68, 68, 0.6))'
+                }} />
+                <h2 className="pixel-font text-3xl mb-4" style={{
+                  color: '#FF6B4A',
+                  textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
+                }}>
+                  INVITE ERROR
+                </h2>
+                <p className="mono-font" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>{error}</p>
+              </div>
+              <button
+                onClick={() => navigate('/')}
+                className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
+              >
+                GO TO HOME
+              </button>
             </div>
-            <button
-              onClick={() => navigate('/')}
-              className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
-            >
-              GO TO HOME
-            </button>
           </div>
-        </div>
-      </div>
+        )}
+      </TVWrapper>
     );
   }
 
   if (!user) {
     return (
-      <div className="mono-font warm-cream-bg min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
+      <TVWrapper showThemeToggle={true} initialDarkMode={true}>
+        {(isLightMode) => (
+          <div className="mono-font max-w-md w-full mx-auto">
+            <div className="text-center mb-8">
+              <h1 className="pixel-font text-6xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
+                letterSpacing: '0.1em',
+                color: '#FF6B4A',
+                textShadow: '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6), 0 0 30px rgba(255, 107, 74, 0.4)'
+              }}>
+                SHOTGUN.AI
+              </h1>
+              <p className="text-lg future-font uppercase tracking-wider" style={{
+                color: '#FF6B4A',
+                textShadow: '0 0 15px rgba(255, 107, 74, 0.8), 0 0 30px rgba(255, 107, 74, 0.4)',
+                fontWeight: '700'
+              }}>
+                ⚡ Crew Invitation ⚡
+              </p>
+            </div>
+
+            <div className="p-8 rounded-lg" style={{
+              background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
+              border: '3px solid #FF6B4A',
+              boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
+            }}>
+              <h2 className="pixel-font text-3xl mb-4" style={{
+                color: '#FF6B4A',
+                textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
+              }}>
+                SIGN IN REQUIRED
+              </h2>
+              <p className="mono-font mb-6" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>
+                You've been invited to join <strong>{group?.name || 'a crew'}</strong>!
+                Please sign in with Google to accept the invitation.
+              </p>
+              <button
+                onClick={handleSignIn}
+                className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
+              >
+                SIGN IN WITH GOOGLE
+              </button>
+            </div>
+          </div>
+        )}
+      </TVWrapper>
+    );
+  }
+
+  return (
+    <TVWrapper showThemeToggle={true} initialDarkMode={true}>
+      {(isLightMode) => (
+        <div className="mono-font max-w-md w-full mx-auto">
           <div className="text-center mb-8">
-            <h1 className="pixel-font text-6xl font-bold mb-2 neon-title glitch" data-text="SHOTGUN.AI" style={{
-              letterSpacing: '0.1em'
+            <h1 className="pixel-font text-6xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
+              letterSpacing: '0.1em',
+              color: '#FF6B4A',
+              textShadow: '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6), 0 0 30px rgba(255, 107, 74, 0.4)'
             }}>
               SHOTGUN.AI
             </h1>
@@ -168,117 +252,100 @@ const AcceptInvite = () => {
               textShadow: '0 0 15px rgba(255, 107, 74, 0.8), 0 0 30px rgba(255, 107, 74, 0.4)',
               fontWeight: '700'
             }}>
-              ⚡ Crew Invitation ⚡
+              ⚡ Join The Crew ⚡
             </p>
           </div>
 
-          <div className="punk-border shadow-retro-lg p-8 bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B] rounded-lg">
-            <h2 className="pixel-font text-3xl deep-forest mb-4" style={{
-              textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
+          <div className="p-8 rounded-lg" style={{
+            background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
+            border: '3px solid #FF6B4A',
+            boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
+          }}>
+            <h2 className="pixel-font text-3xl mb-6" style={{
+              color: '#FF6B4A',
+              textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
             }}>
-              SIGN IN REQUIRED
+              CREW INVITATION
             </h2>
-            <p className="mono-font text-gray-600 mb-6">
-              You've been invited to join <strong>{group?.name || 'a crew'}</strong>!
-              Please sign in with Google to accept the invitation.
-            </p>
-            <button
-              onClick={handleSignIn}
-              className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
-            >
-              SIGN IN WITH GOOGLE
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  return (
-    <div className="mono-font warm-cream-bg min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <h1 className="pixel-font text-6xl font-bold mb-2 neon-title glitch" data-text="SHOTGUN.AI" style={{
-            letterSpacing: '0.1em'
-          }}>
-            SHOTGUN.AI
-          </h1>
-          <p className="text-lg future-font uppercase tracking-wider" style={{
-            color: '#FF6B4A',
-            textShadow: '0 0 15px rgba(255, 107, 74, 0.8), 0 0 30px rgba(255, 107, 74, 0.4)',
-            fontWeight: '700'
-          }}>
-            ⚡ Join The Crew ⚡
-          </p>
-        </div>
-
-        <div className="punk-border shadow-retro-lg p-8 bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B] rounded-lg">
-          <h2 className="pixel-font text-3xl deep-forest mb-6" style={{
-            textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
-          }}>
-            CREW INVITATION
-          </h2>
-
-          {/* Invitation Details */}
-          <div className="mb-6 p-4 bg-white border-4 border-[#3D405B] rounded" style={{
-            boxShadow: '4px 4px 0px 0px #3D405B'
-          }}>
-            <div className="flex items-center gap-3 mb-3">
-              <Users size={24} className="text-[#2A9D8F]" />
-              <div>
-                <p className="text-sm mono-font text-gray-600">Crew Name</p>
-                <p className="pixel-font text-xl deep-forest">{group?.name || 'Loading...'}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 mb-3">
-              <Mail size={24} className="text-[#E07A5F]" />
-              <div>
-                <p className="text-sm mono-font text-gray-600">Invited By</p>
-                <p className="mono-font font-bold deep-forest">{invite?.inviterEmail}</p>
-              </div>
-            </div>
-
-            {group?.members && group.members.length > 0 && (
-              <div className="flex items-center gap-3">
-                <Car size={24} className="text-[#F4A261]" />
+            {/* Invitation Details */}
+            <div className="mb-6 p-4 rounded" style={{
+              background: isLightMode ? 'rgba(245, 240, 230, 0.9)' : 'rgba(10, 10, 10, 0.8)',
+              border: '2px solid #FF8B6A',
+              boxShadow: '0 0 10px rgba(255, 107, 74, 0.2)'
+            }}>
+              <div className="flex items-center gap-3 mb-3">
+                <Users size={24} style={{
+                  color: '#FF8B6A',
+                  filter: 'drop-shadow(0 0 5px rgba(255, 139, 106, 0.5))'
+                }} />
                 <div>
-                  <p className="text-sm mono-font text-gray-600">Current Members</p>
-                  <p className="mono-font font-bold deep-forest">{group.members.length} member{group.members.length !== 1 ? 's' : ''}</p>
+                  <p className="text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Crew Name</p>
+                  <p className="pixel-font text-xl" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{group?.name || 'Loading...'}</p>
                 </div>
               </div>
-            )}
-          </div>
 
-          <p className="mono-font text-sm text-gray-600 mb-6">
-            By accepting, you'll join this crew and be able to track rides, share costs, and see everyone's points in real-time.
-          </p>
+              <div className="flex items-center gap-3 mb-3">
+                <Mail size={24} style={{
+                  color: '#FF6B4A',
+                  filter: 'drop-shadow(0 0 5px rgba(255, 107, 74, 0.5))'
+                }} />
+                <div>
+                  <p className="text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Invited By</p>
+                  <p className="mono-font font-bold" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{invite?.inviterEmail}</p>
+                </div>
+              </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border-2 border-red-500 rounded">
-              <p className="text-red-600 text-sm font-bold mono-font">{error}</p>
+              {group?.members && group.members.length > 0 && (
+                <div className="flex items-center gap-3">
+                  <Car size={24} style={{
+                    color: '#FFB088',
+                    filter: 'drop-shadow(0 0 5px rgba(255, 176, 136, 0.5))'
+                  }} />
+                  <div>
+                    <p className="text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Current Members</p>
+                    <p className="mono-font font-bold" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{group.members.length} member{group.members.length !== 1 ? 's' : ''}</p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={handleDecline}
-              disabled={accepting}
-              className="pixel-button-secondary py-3 rounded-lg text-white pixel-font text-lg"
-            >
-              DECLINE
-            </button>
-            <button
-              onClick={handleAcceptInvite}
-              disabled={accepting}
-              className="pixel-button py-3 rounded-lg text-white pixel-font text-lg"
-            >
-              {accepting ? 'JOINING...' : 'ACCEPT'}
-            </button>
+            <p className="mono-font text-sm mb-6" style={{ color: isLightMode ? '#666' : '#AAA' }}>
+              By accepting, you'll join this crew and be able to track rides, share costs, and see everyone's points in real-time.
+            </p>
+
+            {error && (
+              <div className="mb-4 p-3 rounded" style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '2px solid rgba(239, 68, 68, 0.6)'
+              }}>
+                <p className="text-sm font-bold mono-font" style={{
+                  color: '#ff4444',
+                  textShadow: '0 0 10px rgba(239, 68, 68, 0.8)'
+                }}>{error}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={handleDecline}
+                disabled={accepting}
+                className="pixel-button-secondary py-3 rounded-lg text-white pixel-font text-lg"
+              >
+                DECLINE
+              </button>
+              <button
+                onClick={handleAcceptInvite}
+                disabled={accepting}
+                className="pixel-button py-3 rounded-lg text-white pixel-font text-lg"
+              >
+                {accepting ? 'JOINING...' : 'ACCEPT'}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </TVWrapper>
   );
 };
 

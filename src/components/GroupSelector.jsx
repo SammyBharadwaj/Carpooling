@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, ChevronDown } from 'lucide-react';
+import { Users, Plus, ChevronDown, Trash2 } from 'lucide-react';
 import { groupService } from '../services/firestoreService';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -34,6 +34,32 @@ const GroupSelector = ({ currentGroupId, onGroupChange, onCreateNew }) => {
     setIsOpen(false);
   };
 
+  const handleDeleteGroup = async (e, groupId) => {
+    e.stopPropagation(); // Prevent selecting the group when clicking delete
+
+    if (!confirm('Are you sure you want to delete this crew from your device?')) {
+      return;
+    }
+
+    try {
+      await groupService.deleteGroup(groupId);
+
+      // Reload groups
+      await loadUserGroups();
+
+      // If we deleted the current group, select another one or create new
+      if (groupId === currentGroupId) {
+        const remainingGroups = groups.filter(g => g.id !== groupId);
+        if (remainingGroups.length > 0) {
+          onGroupChange(remainingGroups[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      alert('Failed to delete crew. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="px-4 py-2 bg-white border-4 border-[#3D405B] rounded mono-font text-sm deep-forest">
@@ -50,7 +76,7 @@ const GroupSelector = ({ currentGroupId, onGroupChange, onCreateNew }) => {
         className="w-full px-4 py-3 bg-white border-4 border-[#3D405B] rounded-lg shadow-retro hover:shadow-retro-lg transition-all flex items-center justify-between group"
       >
         <div className="flex items-center gap-3">
-          <Users size={20} className="text-[#2A9D8F]" />
+          <Users size={20} className="text-[#FF6B4A]" />
           <div className="text-left">
             <p className="text-xs mono-font text-gray-600">Current Crew</p>
             <p className="pixel-font text-lg deep-forest">
@@ -79,23 +105,34 @@ const GroupSelector = ({ currentGroupId, onGroupChange, onCreateNew }) => {
             {groups.length > 0 ? (
               <div className="py-2">
                 {groups.map((group) => (
-                  <button
+                  <div
                     key={group.id}
-                    onClick={() => handleSelectGroup(group)}
-                    className={`w-full px-4 py-3 text-left hover:bg-[#FDF8F3] transition-colors flex items-center justify-between ${
+                    className={`w-full px-4 py-3 hover:bg-[#FDF8F3] transition-colors flex items-center justify-between group/item ${
                       group.id === currentGroupId ? 'bg-[#FDF8F3]' : ''
                     }`}
                   >
-                    <div>
-                      <p className="pixel-font text-lg deep-forest">{group.name}</p>
-                      <p className="text-xs mono-font text-gray-600">
-                        {group.members?.length || 0} member{group.members?.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                    {group.id === currentGroupId && (
-                      <div className="w-2 h-2 rounded-full bg-[#2A9D8F]" />
-                    )}
-                  </button>
+                    <button
+                      onClick={() => handleSelectGroup(group)}
+                      className="flex-1 text-left flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="pixel-font text-lg deep-forest">{group.name}</p>
+                        <p className="text-xs mono-font text-gray-600">
+                          {group.members?.length || 0} member{group.members?.length !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      {group.id === currentGroupId && (
+                        <div className="w-2 h-2 rounded-full bg-[#FF6B4A]" />
+                      )}
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteGroup(e, group.id)}
+                      className="ml-2 p-2 rounded hover:bg-red-100 transition-colors opacity-0 group-hover/item:opacity-100"
+                      title="Delete crew from device"
+                    >
+                      <Trash2 size={16} className="text-red-500" />
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : (
