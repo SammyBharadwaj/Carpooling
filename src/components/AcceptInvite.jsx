@@ -147,7 +147,19 @@ const AcceptInvite = () => {
       console.error('Error accepting invite - Full error:', err);
       console.error('Error message:', err.message);
       console.error('Error code:', err.code);
-      setError(`Failed to join the crew: ${err.message || 'Please try again.'}`);
+      console.error('Error stack:', err.stack);
+
+      // Show specific error message
+      let errorMessage = 'Failed to join the crew. ';
+      if (err.code === 'permission-denied') {
+        errorMessage += 'Permission denied - please contact the crew owner.';
+      } else if (err.message) {
+        errorMessage += err.message;
+      } else {
+        errorMessage += 'Please try again.';
+      }
+
+      setError(errorMessage);
     } finally {
       setAccepting(false);
     }
