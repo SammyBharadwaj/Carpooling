@@ -582,13 +582,20 @@ const ShotgunAI = () => {
     // Find the member being removed
     const memberToRemove = members.find(m => m.id === id);
 
-    // Prevent removing yourself
-    if (memberToRemove && memberToRemove.email?.toLowerCase() === user?.email?.toLowerCase()) {
+    console.log('Attempting to remove member:', memberToRemove);
+    console.log('Current user uid:', user?.uid);
+    console.log('Member userId:', memberToRemove?.userId);
+
+    // Prevent removing yourself - check by userId (not email)
+    if (memberToRemove && memberToRemove.userId && memberToRemove.userId === user?.uid) {
       alert("You cannot remove yourself from the crew!");
       return;
     }
 
-    setMembers(members.filter(m => m.id !== id));
+    // If no confirmation needed, just remove
+    if (confirm(`Remove ${memberToRemove?.name} from the crew?`)) {
+      setMembers(members.filter(m => m.id !== id));
+    }
   };
 
   // Toggle passenger
