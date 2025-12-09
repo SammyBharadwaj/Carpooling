@@ -22,10 +22,11 @@ const AcceptInvite = () => {
 
   // Auto-accept invite when user is signed in
   useEffect(() => {
-    if (user && invite && !accepting) {
+    if (user && invite && !accepting && !loading && !error) {
+      console.log('Auto-accepting invite for user:', user.email);
       handleAcceptInvite();
     }
-  }, [user, invite]);
+  }, [user, invite, loading, error]);
 
   const loadInviteData = async () => {
     try {
