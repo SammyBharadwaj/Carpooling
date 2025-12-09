@@ -18,8 +18,14 @@ const AcceptInvite = () => {
   const [hasAttemptedAccept, setHasAttemptedAccept] = useState(false);
 
   useEffect(() => {
-    loadInviteData();
-  }, [inviteId]);
+    // Only load invite data after user signs in
+    if (user) {
+      loadInviteData();
+    } else {
+      // Stop loading so sign-in button shows
+      setLoading(false);
+    }
+  }, [inviteId, user]);
 
   // Don't auto-accept - let user click button instead
   // useEffect(() => {
