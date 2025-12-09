@@ -141,7 +141,7 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
           .tv-container {
             background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
             border-radius: 20px 20px 8px 8px;
-            padding: 40px 50px 100px 50px;
+            padding: 20px 20px 80px 20px;
             box-shadow:
               0 0 0 8px #3a3a3a,
               0 0 0 12px #1a1a1a,
@@ -153,15 +153,39 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
             margin: 0 auto;
           }
 
+          @media (min-width: 640px) {
+            .tv-container {
+              padding: 30px 35px 90px 35px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .tv-container {
+              padding: 40px 50px 100px 50px;
+            }
+          }
+
           /* TV Screen Bezel */
           .tv-screen-bezel {
             background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
-            padding: 30px;
+            padding: 15px;
             border-radius: 12px;
             box-shadow:
               inset 0 0 30px rgba(0, 0, 0, 0.8),
               inset 0 0 60px rgba(0, 0, 0, 0.6);
             position: relative;
+          }
+
+          @media (min-width: 640px) {
+            .tv-screen-bezel {
+              padding: 20px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .tv-screen-bezel {
+              padding: 30px;
+            }
           }
 
           /* CRT Screen - Dark Mode */
@@ -174,13 +198,27 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
               ),
               linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
             border-radius: 8px;
-            padding: 40px 30px;
+            padding: 20px 15px;
             position: relative;
             overflow: hidden;
             box-shadow:
               inset 0 0 100px rgba(100, 150, 200, 0.1),
               inset 0 0 30px rgba(150, 180, 210, 0.15);
-            min-height: 70vh;
+            min-height: 60vh;
+          }
+
+          @media (min-width: 640px) {
+            .crt-screen-dark {
+              padding: 30px 20px;
+              min-height: 65vh;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .crt-screen-dark {
+              padding: 40px 30px;
+              min-height: 70vh;
+            }
           }
 
           /* CRT Screen - Light Mode */
@@ -193,13 +231,27 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
               ),
               linear-gradient(180deg, #F5F1ED 0%, #E8E2DC 100%);
             border-radius: 8px;
-            padding: 40px 30px;
+            padding: 20px 15px;
             position: relative;
             overflow: hidden;
             box-shadow:
               inset 0 0 100px rgba(200, 180, 150, 0.2),
               inset 0 0 30px rgba(210, 190, 170, 0.25);
-            min-height: 70vh;
+            min-height: 60vh;
+          }
+
+          @media (min-width: 640px) {
+            .crt-screen-light {
+              padding: 30px 20px;
+              min-height: 65vh;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .crt-screen-light {
+              padding: 40px 30px;
+              min-height: 70vh;
+            }
           }
 
           /* CRT Glass reflection */

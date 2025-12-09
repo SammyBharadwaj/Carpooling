@@ -15,18 +15,20 @@ const AcceptInvite = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [accepting, setAccepting] = useState(false);
+  const [hasAttemptedAccept, setHasAttemptedAccept] = useState(false);
 
   useEffect(() => {
     loadInviteData();
   }, [inviteId]);
 
-  // Auto-accept invite when user is signed in
+  // Auto-accept invite when user is signed in - only once
   useEffect(() => {
-    if (user && invite && !accepting && !loading && !error) {
+    if (user && invite && !accepting && !loading && !error && !hasAttemptedAccept) {
       console.log('Auto-accepting invite for user:', user.email);
+      setHasAttemptedAccept(true);
       handleAcceptInvite();
     }
-  }, [user, invite, loading, error]);
+  }, [user, invite, loading, error, hasAttemptedAccept]);
 
   const loadInviteData = async () => {
     try {
@@ -260,16 +262,16 @@ const AcceptInvite = () => {
   return (
     <TVWrapper showThemeToggle={true} initialDarkMode={true}>
       {(isLightMode) => (
-        <div className="mono-font max-w-md w-full mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="pixel-font text-6xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
+        <div className="mono-font max-w-md w-full mx-auto px-4">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="pixel-font text-4xl sm:text-5xl md:text-6xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
               letterSpacing: '0.1em',
               color: '#FF6B4A',
               textShadow: '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6), 0 0 30px rgba(255, 107, 74, 0.4)'
             }}>
               SHOTGUN.AI
             </h1>
-            <p className="text-lg future-font uppercase tracking-wider" style={{
+            <p className="text-sm sm:text-base md:text-lg future-font uppercase tracking-wider" style={{
               color: '#FF6B4A',
               textShadow: '0 0 15px rgba(255, 107, 74, 0.8), 0 0 30px rgba(255, 107, 74, 0.4)',
               fontWeight: '700'
@@ -278,12 +280,12 @@ const AcceptInvite = () => {
             </p>
           </div>
 
-          <div className="p-8 rounded-lg" style={{
+          <div className="p-4 sm:p-6 md:p-8 rounded-lg" style={{
             background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
             border: '3px solid #FF6B4A',
             boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
           }}>
-            <h2 className="pixel-font text-3xl mb-6" style={{
+            <h2 className="pixel-font text-2xl sm:text-3xl mb-4 sm:mb-6" style={{
               color: '#FF6B4A',
               textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
             }}>

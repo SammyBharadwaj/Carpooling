@@ -476,8 +476,8 @@ const LoginPage = () => {
                 </div>
 
                 {/* Login Card */}
-                <div className="max-w-md mx-auto" style={{ border: 'none' }}>
-                  <h2 className="pixel-font text-4xl md:text-5xl mb-6 text-center" style={{
+                <div className="max-w-md mx-auto px-4" style={{ border: 'none' }}>
+                  <h2 className="pixel-font text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6 text-center" style={{
                     color: isLightMode ? '#3D405B' : '#FF6B4A',
                     textShadow: isLightMode
                       ? '2px 2px 0px rgba(224, 122, 95, 0.2)'

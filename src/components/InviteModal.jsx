@@ -61,10 +61,10 @@ const InviteModal = ({ isOpen, onClose, groupId, groupName, currentMembers, onMe
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className="punk-border shadow-retro-lg p-8 bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B] rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="punk-border shadow-retro-lg p-4 sm:p-6 md:p-8 bg-gradient-to-br from-white to-[#FDF8F3] border-[#3D405B] rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="pixel-font text-3xl deep-forest" style={{
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="pixel-font text-2xl sm:text-3xl deep-forest" style={{
             textShadow: '2px 2px 0px rgba(224, 122, 95, 0.2)'
           }}>
             ADD MEMBER
