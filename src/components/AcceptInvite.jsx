@@ -67,14 +67,28 @@ const AcceptInvite = () => {
   };
 
   const handleAcceptInvite = async () => {
-    if (!user || !invite) return;
+    if (!user || !invite) {
+      console.log('Missing user or invite:', { user: !!user, invite: !!invite });
+      return;
+    }
 
     try {
       setAccepting(true);
       setError('');
 
+      console.log('Starting invite acceptance for group:', invite.groupId);
+
       // Get group data first to check if user is already a member
       const groupData = await groupService.getGroup(invite.groupId);
+
+      if (!groupData) {
+        console.error('Group not found:', invite.groupId);
+        setError('This crew no longer exists.');
+        setAccepting(false);
+        return;
+      }
+
+      console.log('Group data loaded:', groupData.name);
 
       // Check if user is already in the group
       const isAlreadyMember = groupData.members?.some(
@@ -82,15 +96,17 @@ const AcceptInvite = () => {
       );
 
       if (isAlreadyMember) {
+        console.log('User already a member, redirecting to dashboard');
         // User is already in the group, just redirect to dashboard
         localStorage.setItem('activeGroupId', invite.groupId);
-        navigate('/', { state: { joinedGroup: group.name } });
+        navigate('/', { state: { joinedGroup: groupData?.name || 'your crew' } });
         return;
       }
 
       // Get member details from invite document (stored in Firestore)
       const memberData = invite.memberData || {};
 
+      console.log('Adding user to group memberIds...');
       // Add user to group
       await groupService.addMemberToGroup(invite.groupId, user.uid);
 
@@ -108,9 +124,12 @@ const AcceptInvite = () => {
         joinedAt: new Date().toISOString()
       };
 
+      console.log('Adding member to group members array:', newMember);
       // Update group with new member data
       const updatedMembers = [...(groupData.members || []), newMember];
       await groupService.updateGroup(invite.groupId, { members: updatedMembers });
+
+      console.log('Member added successfully!');
 
       // Store the new groupId in user's active groups
       const activeGroupId = localStorage.getItem('activeGroupId');
@@ -119,11 +138,13 @@ const AcceptInvite = () => {
       }
 
       // Redirect to dashboard
-      navigate('/', { state: { joinedGroup: group.name } });
+      navigate('/', { state: { joinedGroup: groupData?.name || 'your crew' } });
 
     } catch (err) {
-      console.error('Error accepting invite:', err);
-      setError('Failed to join the crew. Please try again.');
+      console.error('Error accepting invite - Full error:', err);
+      console.error('Error message:', err.message);
+      console.error('Error code:', err.code);
+      setError(`Failed to join the crew: ${err.message || 'Please try again.'}`);
     } finally {
       setAccepting(false);
     }
