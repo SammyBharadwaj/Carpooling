@@ -21,14 +21,14 @@ const AcceptInvite = () => {
     loadInviteData();
   }, [inviteId]);
 
-  // Auto-accept invite when user is signed in - only once
-  useEffect(() => {
-    if (user && invite && !accepting && !loading && !error && !hasAttemptedAccept) {
-      console.log('Auto-accepting invite for user:', user.email);
-      setHasAttemptedAccept(true);
-      handleAcceptInvite();
-    }
-  }, [user, invite, loading, error, hasAttemptedAccept]);
+  // Don't auto-accept - let user click button instead
+  // useEffect(() => {
+  //   if (user && invite && !accepting && !loading && !error && !hasAttemptedAccept) {
+  //     console.log('Auto-accepting invite for user:', user.email);
+  //     setHasAttemptedAccept(true);
+  //     handleAcceptInvite();
+  //   }
+  // }, [user, invite, loading, error, hasAttemptedAccept]);
 
   const loadInviteData = async () => {
     try {
@@ -72,6 +72,7 @@ const AcceptInvite = () => {
   const handleAcceptInvite = async () => {
     if (!user || !invite) {
       console.log('Missing user or invite:', { user: !!user, invite: !!invite });
+      setError('Please sign in first.');
       return;
     }
 
@@ -81,7 +82,7 @@ const AcceptInvite = () => {
 
       console.log('Starting invite acceptance for group:', invite.groupId);
 
-      // Get group data first to check if user is already a member
+      // Get group data
       const groupData = await groupService.getGroup(invite.groupId);
 
       if (!groupData) {
@@ -100,20 +101,13 @@ const AcceptInvite = () => {
 
       if (isAlreadyMember) {
         console.log('User already a member, redirecting to dashboard');
-        // User is already in the group, just redirect to dashboard
         localStorage.setItem('activeGroupId', invite.groupId);
         navigate('/', { state: { joinedGroup: groupData?.name || 'your crew' } });
         return;
       }
 
-      // Get member details from invite document (stored in Firestore)
-      const memberData = invite.memberData || {};
-
-      console.log('Adding user to group memberIds...');
-      // Add user to group
-      await groupService.addMemberToGroup(invite.groupId, user.uid);
-
       // Create new member object
+      const memberData = invite.memberData || {};
       const newMember = {
         userId: user.uid,
         email: user.email,
@@ -127,18 +121,21 @@ const AcceptInvite = () => {
         joinedAt: new Date().toISOString()
       };
 
-      console.log('Adding member to group members array:', newMember);
-      // Update group with new member data
+      console.log('Adding member to group:', newMember);
+
+      // Simple approach: Just update members array and memberIds together
       const updatedMembers = [...(groupData.members || []), newMember];
-      await groupService.updateGroup(invite.groupId, { members: updatedMembers });
+      const updatedMemberIds = [...(groupData.memberIds || []), user.uid];
+
+      await groupService.updateGroup(invite.groupId, {
+        members: updatedMembers,
+        memberIds: updatedMemberIds
+      });
 
       console.log('Member added successfully!');
 
-      // Store the new groupId in user's active groups
-      const activeGroupId = localStorage.getItem('activeGroupId');
-      if (!activeGroupId) {
-        localStorage.setItem('activeGroupId', invite.groupId);
-      }
+      // Store the group
+      localStorage.setItem('activeGroupId', invite.groupId);
 
       // Redirect to dashboard
       navigate('/', { state: { joinedGroup: groupData?.name || 'your crew' } });
@@ -147,12 +144,11 @@ const AcceptInvite = () => {
       console.error('Error accepting invite - Full error:', err);
       console.error('Error message:', err.message);
       console.error('Error code:', err.code);
-      console.error('Error stack:', err.stack);
 
       // Show specific error message
       let errorMessage = 'Failed to join the crew. ';
       if (err.code === 'permission-denied') {
-        errorMessage += 'Permission denied - please contact the crew owner.';
+        errorMessage += 'Permission denied. Please make sure Firestore rules allow group writes.';
       } else if (err.message) {
         errorMessage += err.message;
       } else {
