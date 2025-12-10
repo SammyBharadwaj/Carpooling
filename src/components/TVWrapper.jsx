@@ -141,34 +141,43 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
           .tv-container {
             background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
             border-radius: 20px 20px 8px 8px;
-            padding: 20px 20px 80px 20px;
+            padding: 10px 10px 60px 10px;
             box-shadow:
               0 0 0 8px #3a3a3a,
               0 0 0 12px #1a1a1a,
               0 30px 80px rgba(0, 0, 0, 0.8),
               inset 0 0 60px rgba(0, 0, 0, 0.5);
             position: relative;
-            max-width: 1400px;
-            width: 95%;
+            max-width: 100%;
+            width: 98%;
             margin: 0 auto;
           }
 
           @media (min-width: 640px) {
             .tv-container {
-              padding: 30px 35px 90px 35px;
+              padding: 20px 25px 80px 25px;
+              max-width: 95%;
             }
           }
 
           @media (min-width: 768px) {
             .tv-container {
+              padding: 30px 40px 90px 40px;
+              max-width: 1200px;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .tv-container {
               padding: 40px 50px 100px 50px;
+              max-width: 1400px;
             }
           }
 
           /* TV Screen Bezel */
           .tv-screen-bezel {
             background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
-            padding: 15px;
+            padding: 8px;
             border-radius: 12px;
             box-shadow:
               inset 0 0 30px rgba(0, 0, 0, 0.8),
@@ -178,11 +187,17 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
 
           @media (min-width: 640px) {
             .tv-screen-bezel {
-              padding: 20px;
+              padding: 15px;
             }
           }
 
           @media (min-width: 768px) {
+            .tv-screen-bezel {
+              padding: 20px;
+            }
+          }
+
+          @media (min-width: 1024px) {
             .tv-screen-bezel {
               padding: 30px;
             }
@@ -198,7 +213,7 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
               ),
               linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
             border-radius: 8px;
-            padding: 20px 15px;
+            padding: 15px 10px;
             position: relative;
             overflow: hidden;
             box-shadow:
@@ -209,15 +224,21 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
 
           @media (min-width: 640px) {
             .crt-screen-dark {
-              padding: 30px 20px;
+              padding: 25px 18px;
               min-height: 65vh;
             }
           }
 
           @media (min-width: 768px) {
             .crt-screen-dark {
-              padding: 40px 30px;
+              padding: 35px 25px;
               min-height: 70vh;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .crt-screen-dark {
+              padding: 40px 30px;
             }
           }
 
@@ -231,7 +252,7 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
               ),
               linear-gradient(180deg, #F5F1ED 0%, #E8E2DC 100%);
             border-radius: 8px;
-            padding: 20px 15px;
+            padding: 15px 10px;
             position: relative;
             overflow: hidden;
             box-shadow:
@@ -242,15 +263,21 @@ const TVWrapper = ({ children, showThemeToggle = false, initialDarkMode = false 
 
           @media (min-width: 640px) {
             .crt-screen-light {
-              padding: 30px 20px;
+              padding: 25px 18px;
               min-height: 65vh;
             }
           }
 
           @media (min-width: 768px) {
             .crt-screen-light {
-              padding: 40px 30px;
+              padding: 35px 25px;
               min-height: 70vh;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .crt-screen-light {
+              padding: 40px 30px;
             }
           }
 

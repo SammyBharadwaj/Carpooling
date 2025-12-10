@@ -192,12 +192,12 @@ const AcceptInvite = () => {
     return (
       <TVWrapper showThemeToggle={true} initialDarkMode={true}>
         {(isLightMode) => (
-          <div className="mono-font text-center">
-            <div className="pixel-font text-4xl mb-4" style={{
+          <div className="mono-font text-center px-4">
+            <div className="pixel-font text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4" style={{
               color: '#FF6B4A',
               textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
             }}>LOADING...</div>
-            <p className="mono-font" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>Fetching invitation details</p>
+            <p className="mono-font text-xs sm:text-sm" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>Fetching invitation details</p>
           </div>
         )}
       </TVWrapper>
@@ -208,28 +208,28 @@ const AcceptInvite = () => {
     return (
       <TVWrapper showThemeToggle={true} initialDarkMode={true}>
         {(isLightMode) => (
-          <div className="mono-font max-w-md w-full mx-auto">
-            <div className="p-8 rounded-lg" style={{
+          <div className="mono-font max-w-md w-full mx-auto px-4">
+            <div className="p-4 sm:p-6 md:p-8 rounded-lg" style={{
               background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
               border: '3px solid #FF6B4A',
               boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
             }}>
-              <div className="text-center mb-6">
-                <X size={48} className="mx-auto mb-4" style={{
+              <div className="text-center mb-4 sm:mb-6">
+                <X size={40} className="mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12" style={{
                   color: '#ff4444',
                   filter: 'drop-shadow(0 0 10px rgba(255, 68, 68, 0.6))'
                 }} />
-                <h2 className="pixel-font text-3xl mb-4" style={{
+                <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4" style={{
                   color: '#FF6B4A',
                   textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
                 }}>
                   INVITE ERROR
                 </h2>
-                <p className="mono-font" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>{error}</p>
+                <p className="mono-font text-xs sm:text-sm" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>{error}</p>
               </div>
               <button
                 onClick={() => navigate('/')}
-                className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
+                className="pixel-button w-full py-2 sm:py-3 rounded-lg text-white pixel-font text-base sm:text-lg md:text-xl"
               >
                 GO TO HOME
               </button>
@@ -244,16 +244,16 @@ const AcceptInvite = () => {
     return (
       <TVWrapper showThemeToggle={true} initialDarkMode={true}>
         {(isLightMode) => (
-          <div className="mono-font max-w-md w-full mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="pixel-font text-6xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
+          <div className="mono-font max-w-md w-full mx-auto px-4">
+            <div className="text-center mb-4 sm:mb-6">
+              <h1 className="pixel-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-1 sm:mb-2 glitch" data-text="SHOTGUN.AI" style={{
                 letterSpacing: '0.1em',
                 color: '#FF6B4A',
                 textShadow: '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6), 0 0 30px rgba(255, 107, 74, 0.4)'
               }}>
                 SHOTGUN.AI
               </h1>
-              <p className="text-lg future-font uppercase tracking-wider" style={{
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg future-font uppercase tracking-wider" style={{
                 color: '#FF6B4A',
                 textShadow: '0 0 15px rgba(255, 107, 74, 0.8), 0 0 30px rgba(255, 107, 74, 0.4)',
                 fontWeight: '700'
@@ -262,24 +262,24 @@ const AcceptInvite = () => {
               </p>
             </div>
 
-            <div className="p-8 rounded-lg" style={{
+            <div className="p-4 sm:p-6 md:p-8 rounded-lg" style={{
               background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
               border: '3px solid #FF6B4A',
               boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
             }}>
-              <h2 className="pixel-font text-3xl mb-4" style={{
+              <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4" style={{
                 color: '#FF6B4A',
                 textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
               }}>
                 SIGN IN REQUIRED
               </h2>
-              <p className="mono-font mb-6" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>
+              <p className="mono-font text-xs sm:text-sm mb-4 sm:mb-6" style={{ color: isLightMode ? '#3D405B' : '#FF8B6A' }}>
                 You've been invited to join <strong>{group?.name || 'a crew'}</strong>!
                 Please sign in with Google to accept the invitation.
               </p>
               <button
                 onClick={handleSignIn}
-                className="pixel-button w-full py-3 rounded-lg text-white pixel-font text-xl"
+                className="pixel-button w-full py-2 sm:py-3 rounded-lg text-white pixel-font text-base sm:text-lg md:text-xl"
               >
                 SIGN IN WITH GOOGLE
               </button>
@@ -294,15 +294,15 @@ const AcceptInvite = () => {
     <TVWrapper showThemeToggle={true} initialDarkMode={true}>
       {(isLightMode) => (
         <div className="mono-font max-w-md w-full mx-auto px-4">
-          <div className="text-center mb-6 sm:mb-8">
-            <h1 className="pixel-font text-4xl sm:text-5xl md:text-6xl font-bold mb-2 glitch" data-text="SHOTGUN.AI" style={{
+          <div className="text-center mb-4 sm:mb-6">
+            <h1 className="pixel-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-1 sm:mb-2 glitch" data-text="SHOTGUN.AI" style={{
               letterSpacing: '0.1em',
               color: '#FF6B4A',
               textShadow: '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6), 0 0 30px rgba(255, 107, 74, 0.4)'
             }}>
               SHOTGUN.AI
             </h1>
-            <p className="text-sm sm:text-base md:text-lg future-font uppercase tracking-wider" style={{
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg future-font uppercase tracking-wider" style={{
               color: '#FF6B4A',
               textShadow: '0 0 15px rgba(255, 107, 74, 0.8), 0 0 30px rgba(255, 107, 74, 0.4)',
               fontWeight: '700'
@@ -311,12 +311,12 @@ const AcceptInvite = () => {
             </p>
           </div>
 
-          <div className="p-4 sm:p-6 md:p-8 rounded-lg" style={{
+          <div className="p-3 sm:p-5 md:p-6 rounded-lg" style={{
             background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(20, 20, 20, 0.8)',
             border: '3px solid #FF6B4A',
             boxShadow: '0 0 15px rgba(255, 107, 74, 0.3)'
           }}>
-            <h2 className="pixel-font text-2xl sm:text-3xl mb-4 sm:mb-6" style={{
+            <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4" style={{
               color: '#FF6B4A',
               textShadow: '0 0 10px rgba(255, 107, 74, 0.6)'
             }}>
@@ -324,48 +324,48 @@ const AcceptInvite = () => {
             </h2>
 
             {/* Invitation Details */}
-            <div className="mb-6 p-4 rounded" style={{
+            <div className="mb-4 sm:mb-5 p-3 sm:p-4 rounded" style={{
               background: isLightMode ? 'rgba(245, 240, 230, 0.9)' : 'rgba(10, 10, 10, 0.8)',
               border: '2px solid #FF8B6A',
               boxShadow: '0 0 10px rgba(255, 107, 74, 0.2)'
             }}>
-              <div className="flex items-center gap-3 mb-3">
-                <Users size={24} style={{
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <Users size={20} className="sm:w-6 sm:h-6" style={{
                   color: '#FF8B6A',
                   filter: 'drop-shadow(0 0 5px rgba(255, 139, 106, 0.5))'
                 }} />
-                <div>
-                  <p className="text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Crew Name</p>
-                  <p className="pixel-font text-xl" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{group?.name || 'Loading...'}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Crew Name</p>
+                  <p className="pixel-font text-base sm:text-lg md:text-xl truncate" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{group?.name || 'Loading...'}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mb-3">
-                <Mail size={24} style={{
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <Mail size={20} className="sm:w-6 sm:h-6" style={{
                   color: '#FF6B4A',
                   filter: 'drop-shadow(0 0 5px rgba(255, 107, 74, 0.5))'
                 }} />
-                <div>
-                  <p className="text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Invited By</p>
-                  <p className="mono-font font-bold" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{invite?.inviterEmail}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Invited By</p>
+                  <p className="mono-font font-bold text-sm sm:text-base truncate" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{invite?.inviterEmail}</p>
                 </div>
               </div>
 
               {group?.members && group.members.length > 0 && (
-                <div className="flex items-center gap-3">
-                  <Car size={24} style={{
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Car size={20} className="sm:w-6 sm:h-6" style={{
                     color: '#FFB088',
                     filter: 'drop-shadow(0 0 5px rgba(255, 176, 136, 0.5))'
                   }} />
-                  <div>
-                    <p className="text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Current Members</p>
-                    <p className="mono-font font-bold" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{group.members.length} member{group.members.length !== 1 ? 's' : ''}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm mono-font" style={{ color: isLightMode ? '#666' : '#888' }}>Current Members</p>
+                    <p className="mono-font font-bold text-sm sm:text-base" style={{ color: isLightMode ? '#3D405B' : '#FFFFFF' }}>{group.members.length} member{group.members.length !== 1 ? 's' : ''}</p>
                   </div>
                 </div>
               )}
             </div>
 
-            <p className="mono-font text-sm mb-6" style={{ color: isLightMode ? '#666' : '#AAA' }}>
+            <p className="mono-font text-xs sm:text-sm mb-4 sm:mb-5" style={{ color: isLightMode ? '#666' : '#AAA' }}>
               By accepting, you'll join this crew and be able to track rides, share costs, and see everyone's points in real-time.
             </p>
 
@@ -381,18 +381,18 @@ const AcceptInvite = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <button
                 onClick={handleDecline}
                 disabled={accepting}
-                className="pixel-button-secondary py-3 rounded-lg text-white pixel-font text-lg"
+                className="pixel-button-secondary py-2 sm:py-3 rounded-lg text-white pixel-font text-base sm:text-lg"
               >
                 DECLINE
               </button>
               <button
                 onClick={handleAcceptInvite}
                 disabled={accepting}
-                className="pixel-button py-3 rounded-lg text-white pixel-font text-lg"
+                className="pixel-button py-2 sm:py-3 rounded-lg text-white pixel-font text-base sm:text-lg"
               >
                 {accepting ? 'JOINING...' : 'ACCEPT'}
               </button>

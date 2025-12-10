@@ -2110,8 +2110,8 @@ const ShotgunAI = () => {
               color: isLightMode ? '#3D405B' : '#FFFFFF'
             }}>
               {/* Header */}
-              <div className="flex items-center justify-between mb-8">
-                <h1 className="pixel-font text-5xl md:text-7xl glitch" data-text="SHOTGUN.AI" style={{
+              <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
+                <h1 className="pixel-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl glitch" data-text="SHOTGUN.AI" style={{
                   letterSpacing: '0.1em',
                   color: '#FF6B4A',
                   textShadow: !isLightMode
@@ -2120,14 +2120,14 @@ const ShotgunAI = () => {
                 }}>
                   SHOTGUN.AI
                 </h1>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   {user && (
-                    <div className="px-3 py-2" style={{
+                    <div className="px-2 py-1 sm:px-3 sm:py-2" style={{
                       background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : '#FFFFFF',
-                      border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
-                      boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '4px 4px 0px 0px #3D405B'
+                      border: !isLightMode ? '2px solid #FF8B6A' : '3px solid #3D405B',
+                      boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '3px 3px 0px 0px #3D405B'
                     }}>
-                      <p className="text-xs font-bold truncate max-w-[150px] mono-font" style={{
+                      <p className="text-xs font-bold truncate max-w-[100px] sm:max-w-[150px] mono-font" style={{
                         color: !isLightMode ? '#FF8B6A' : '#3D405B'
                       }}>
                         {user.displayName || user.email}
@@ -2136,15 +2136,15 @@ const ShotgunAI = () => {
                   )}
                   <div className="tooltip">
                     <button
-                      className="p-3 transition-all"
+                      className="p-2 sm:p-3 transition-all"
                       style={{
                         background: !isLightMode ? 'rgba(40, 20, 10, 0.8)' : '#2a2a2a',
                         color: !isLightMode ? '#FF8B6A' : '#FF6B4A',
-                        border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
-                        boxShadow: !isLightMode ? '0 0 10px rgba(134, 239, 172, 0.2)' : '4px 4px 0px 0px #3D405B'
+                        border: !isLightMode ? '2px solid #FF8B6A' : '3px solid #3D405B',
+                        boxShadow: !isLightMode ? '0 0 10px rgba(134, 239, 172, 0.2)' : '3px 3px 0px 0px #3D405B'
                       }}
                     >
-                      <Check size={20} className="pixel-icon" />
+                      <Check size={16} className="pixel-icon sm:w-5 sm:h-5" />
                     </button>
                     <span className="tooltiptext">
                       <strong>Auto-Save Active</strong><br/>
@@ -2153,55 +2153,55 @@ const ShotgunAI = () => {
                   </div>
                   <button
                     onClick={() => setCurrentView('lobby')}
-                    className="p-3 transition-all"
+                    className="p-2 sm:p-3 transition-all"
                     style={{
                       background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : '#FFFFFF',
                       color: !isLightMode ? '#FF8B6A' : '#3D405B',
-                      border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
-                      boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '4px 4px 0px 0px #3D405B'
+                      border: !isLightMode ? '2px solid #FF8B6A' : '3px solid #3D405B',
+                      boxShadow: !isLightMode ? '0 0 10px rgba(255, 107, 74, 0.2)' : '3px 3px 0px 0px #3D405B'
                     }}
                     aria-label="Go to settings"
                   >
-                    <Settings size={20} className="pixel-icon" />
+                    <Settings size={16} className="pixel-icon sm:w-5 sm:h-5" />
                   </button>
                   <button
                     onClick={logout}
-                    className="p-3 transition-all"
+                    className="p-2 sm:p-3 transition-all"
                     style={{
                       background: !isLightMode ? 'rgba(100, 20, 20, 0.8)' : '#2a2a2a',
                       color: !isLightMode ? '#FF8B6A' : '#D84315',
-                      border: !isLightMode ? '2px solid #DC2626' : '4px solid #3D405B',
-                      boxShadow: !isLightMode ? '0 0 10px rgba(220, 38, 38, 0.3)' : '4px 4px 0px 0px #3D405B'
+                      border: !isLightMode ? '2px solid #DC2626' : '3px solid #3D405B',
+                      boxShadow: !isLightMode ? '0 0 10px rgba(220, 38, 38, 0.3)' : '3px 3px 0px 0px #3D405B'
                     }}
                     aria-label="Logout"
                   >
-                    <LogOut size={20} className="pixel-icon" />
+                    <LogOut size={16} className="pixel-icon sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </div>
 
               {/* Main Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
                 {/* Leaderboard Card */}
                 <div className="rounded-lg overflow-hidden flex flex-col stagger-1" style={{
                   background: !isLightMode ? 'rgba(20, 20, 20, 0.8)' : '#FFFFFF',
-                  border: !isLightMode ? '3px solid #FF6B4A' : '4px solid #3D405B',
-                  boxShadow: !isLightMode ? '0 0 15px rgba(255, 107, 74, 0.3)' : '4px 4px 0px 0px #3D405B'
+                  border: !isLightMode ? '3px solid #FF6B4A' : '3px solid #3D405B',
+                  boxShadow: !isLightMode ? '0 0 15px rgba(255, 107, 74, 0.3)' : '3px 3px 0px 0px #3D405B'
                 }}>
-                  <div className="p-4" style={{
+                  <div className="p-3 sm:p-4" style={{
                     background: darkMode
                       ? 'linear-gradient(to right, rgba(224, 122, 95, 0.3), rgba(244, 162, 97, 0.3))'
                       : 'linear-gradient(to right, #E07A5F, #FF8B6A)',
-                    borderBottom: !isLightMode ? '2px solid #FF6B4A' : '4px solid #3D405B'
+                    borderBottom: !isLightMode ? '2px solid #FF6B4A' : '3px solid #3D405B'
                   }}>
                     <div className="flex items-center justify-between">
-                      <h2 className="pixel-font text-3xl text-white flex items-center gap-2">
-                        <Crown className="pixel-icon" />
+                      <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white flex items-center gap-2">
+                        <Crown className="pixel-icon w-5 h-5 sm:w-6 sm:h-6" />
                         LEADERBOARD
                       </h2>
                       <div className="tooltip">
-                        <AlertCircle size={20} className="pixel-icon text-white cursor-help" />
-                        <span className="tooltiptext">
+                        <AlertCircle size={16} className="pixel-icon text-white cursor-help sm:w-5 sm:h-5" />
+                        <span className="tooltiptext text-xs sm:text-sm">
                           <strong>How Points Work:</strong><br/>
                           • Driver: Gains 2.1× distance<br/>
                           • DD Bonus: +30% points<br/>
@@ -2215,7 +2215,7 @@ const ShotgunAI = () => {
                     </div>
                   </div>
 
-                  <div className="p-6 flex-1">
+                  <div className="p-3 sm:p-4 md:p-6 flex-1">
                     {members.length === 0 ? (
                       <p className="text-center py-8" style={{
                         color: !isLightMode ? '#888' : '#666'
@@ -2327,8 +2327,8 @@ const ShotgunAI = () => {
                     borderBottom: !isLightMode ? '2px solid #FF6B4A' : '4px solid #3D405B'
                   }}>
                     <div className="flex items-center justify-between">
-                      <h2 className="pixel-font text-3xl text-white flex items-center gap-2">
-                        <History className="pixel-icon" />
+                      <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white flex items-center gap-2">
+                        <History className="pixel-icon w-5 h-5 sm:w-6 sm:h-6" />
                         TRIP HISTORY
                       </h2>
                       <button
@@ -2469,7 +2469,7 @@ const ShotgunAI = () => {
                 <button
                   onClick={calculateNextDriver}
                   disabled={members.length === 0}
-                  className="pixel-button w-full py-6 text-white pixel-font text-3xl rounded-lg flex items-center justify-center gap-3"
+                  className="pixel-button w-full py-4 sm:py-5 md:py-6 text-white pixel-font text-xl sm:text-2xl md:text-3xl rounded-lg flex items-center justify-center gap-2 sm:gap-3"
                 >
                   🎰 WHO DRIVES NEXT?
                 </button>
@@ -2486,7 +2486,7 @@ const ShotgunAI = () => {
                     ? 'bg-gradient-to-r from-gray-700 to-gray-800'
                     : 'bg-gradient-to-r from-[#3D405B] to-[#2A2C3E]'
                 }`}>
-                  <h2 className={`pixel-font text-3xl flex items-center gap-2 ${
+                  <h2 className={`pixel-font text-xl sm:text-2xl md:text-3xl flex items-center gap-2 ${
                     !isLightMode ? 'text-[#FF8B6A] neon-teal' : 'text-[#FF8B6A]'
                   }`}>
                     <MapPin className="pixel-icon" />
@@ -2603,8 +2603,8 @@ const ShotgunAI = () => {
       {showTripModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
           <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF8B6A] max-w-2xl w-full slide-up shadow-retro-lg max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-[#FF8B6A] to-[#FF8B6A] p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between sticky top-0 z-10">
-              <h2 className="pixel-font text-3xl text-white">
+            <div className="bg-gradient-to-r from-[#FF8B6A] to-[#FF8B6A] p-3 sm:p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between sticky top-0 z-10">
+              <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white">
                 {editingTrip ? 'EDIT TRIP' : 'LOG NEW TRIP'}
               </h2>
               <button onClick={resetTripForm} className="text-white hover:text-gray-200" aria-label="Close modal">
@@ -2821,8 +2821,8 @@ const ShotgunAI = () => {
           <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF8B6A] max-w-md w-full slide-up shine-effect" style={{
             boxShadow: '12px 12px 0px #FF8B6A, 0 0 60px rgba(244, 162, 97, 0.8)'
           }}>
-            <div className="bg-gradient-to-r from-[#3D405B] to-[#2A2C3E] p-4 rounded-t-lg border-b-4 border-[#FF8B6A]">
-              <h2 className="pixel-font text-3xl text-[#FF8B6A] text-center glitch" data-text="🎰 COMPUTING..." style={{
+            <div className="bg-gradient-to-r from-[#3D405B] to-[#2A2C3E] p-3 sm:p-4 rounded-t-lg border-b-4 border-[#FF8B6A]">
+              <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-[#FF8B6A] text-center glitch" data-text="🎰 COMPUTING..." style={{
                 textShadow: '0 0 20px rgba(244, 162, 97, 0.8)'
               }}>
                 🎰 COMPUTING...
@@ -2966,8 +2966,8 @@ const ShotgunAI = () => {
           <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF6B4A] max-w-md w-full slide-up" style={{
             boxShadow: '12px 12px 0px red, 0 0 60px rgba(239, 68, 68, 0.8)'
           }}>
-            <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 rounded-t-lg border-b-4 border-[#D84315]">
-              <h2 className="pixel-font text-3xl text-white text-center" style={{
+            <div className="bg-gradient-to-r from-red-600 to-red-700 p-3 sm:p-4 rounded-t-lg border-b-4 border-[#D84315]">
+              <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white text-center" style={{
                 textShadow: '2px 2px 0px rgba(0, 0, 0, 0.3)'
               }}>
                 ⚠️ DELETE GROUP?
@@ -3011,9 +3011,9 @@ const ShotgunAI = () => {
       {showStatsCard && trips.length > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
           <div className="bg-gradient-to-br from-white to-[#FDF8F3] rounded-lg border-4 border-[#FF8B6A] max-w-lg w-full slide-up shadow-retro-lg">
-            <div className="bg-gradient-to-r from-[#FF8B6A] to-[#FF8B6A] p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between">
-              <h2 className="pixel-font text-3xl text-white flex items-center gap-2">
-                <BarChart3 className="pixel-icon" />
+            <div className="bg-gradient-to-r from-[#FF8B6A] to-[#FF8B6A] p-3 sm:p-4 rounded-t-lg border-b-4 border-[#3D405B] flex items-center justify-between">
+              <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white flex items-center gap-2">
+                <BarChart3 className="pixel-icon w-5 h-5 sm:w-6 sm:h-6" />
                 GROUP STATS
               </h2>
               <button onClick={() => setShowStatsCard(false)} className="text-white hover:text-gray-200" aria-label="Close stats">
