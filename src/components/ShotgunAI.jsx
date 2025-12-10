@@ -2181,12 +2181,12 @@ const ShotgunAI = () => {
                       : 'linear-gradient(to right, #E07A5F, #FF8B6A)',
                     borderBottom: !isLightMode ? '2px solid #FF6B4A' : '3px solid #3D405B'
                   }}>
-                    <div className="flex items-center justify-between">
-                      <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white flex items-center gap-2">
-                        <Crown className="pixel-icon w-5 h-5 sm:w-6 sm:h-6" />
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <h2 className="pixel-font text-2xl sm:text-2xl md:text-3xl text-white flex items-center justify-center sm:justify-start gap-2">
+                        <Crown className="pixel-icon w-6 h-6 sm:w-6 sm:h-6" />
                         LEADERBOARD
                       </h2>
-                      <div className="tooltip">
+                      <div className="tooltip flex justify-center sm:justify-start">
                         <AlertCircle size={16} className="pixel-icon text-white cursor-help sm:w-5 sm:h-5" />
                         <span className="tooltiptext text-xs sm:text-sm">
                           <strong>How Points Work:</strong><br/>
@@ -2219,22 +2219,24 @@ const ShotgunAI = () => {
 
                             return (
                               <div key={member.id} className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-2xl font-bold" style={{
+                                {/* Mobile: Stack vertically, Desktop: Side by side */}
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+                                  {/* Rank and Member Info */}
+                                  <div className="flex items-start gap-3 flex-1">
+                                    <span className="text-3xl sm:text-2xl font-bold shrink-0" style={{
                                       color: !isLightMode ? '#FF8B6A' : '#3D405B'
                                     }}>
                                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                                     </span>
-                                    <div>
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-bold" style={{
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="font-bold text-base sm:text-sm truncate" style={{
                                           color: !isLightMode ? '#FF8B6A' : '#3D405B'
                                         }}>{member.name}</span>
                                         {member.vehicleType === 'gas' ? (
-                                          <Fuel size={18} className="pixel-icon text-[#E07A5F]" />
+                                          <Fuel size={18} className="pixel-icon text-[#E07A5F] shrink-0" />
                                         ) : (
-                                          <Zap size={18} className="pixel-icon text-[#FFB088]" />
+                                          <Zap size={18} className="pixel-icon text-[#FFB088] shrink-0" />
                                         )}
                                         {member.ddCount > 0 && (
                                           <div className="flex items-center gap-0.5">
@@ -2244,15 +2246,16 @@ const ShotgunAI = () => {
                                           </div>
                                         )}
                                       </div>
-                                      <div className="text-xs" style={{
+                                      <div className="text-xs mt-1" style={{
                                         color: !isLightMode ? '#888' : '#666'
                                       }}>
                                         {member.tripCount} trips • {member.milesDriven.toFixed(1)} mi
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="text-right">
-                                    <div className="font-bold text-lg" style={{
+                                  {/* Points - Centered on mobile, right-aligned on desktop */}
+                                  <div className="text-center sm:text-right self-center sm:self-auto">
+                                    <div className="font-bold text-2xl sm:text-lg" style={{
                                       color: !isLightMode ? '#FFB088' : '#FF8B6A'
                                     }}>{member.points.toFixed(1)}</div>
                                     <div className="text-xs" style={{
@@ -2307,20 +2310,20 @@ const ShotgunAI = () => {
                   border: !isLightMode ? '3px solid #FF6B4A' : '4px solid #3D405B',
                   boxShadow: !isLightMode ? '0 0 15px rgba(255, 107, 74, 0.3)' : '4px 4px 0px 0px #3D405B'
                 }}>
-                  <div className="p-4" style={{
+                  <div className="p-3 sm:p-4" style={{
                     background: darkMode
                       ? 'linear-gradient(to right, rgba(224, 122, 95, 0.3), rgba(244, 162, 97, 0.3))'
                       : 'linear-gradient(to right, #E07A5F, #FF8B6A)',
                     borderBottom: !isLightMode ? '2px solid #FF6B4A' : '4px solid #3D405B'
                   }}>
-                    <div className="flex items-center justify-between">
-                      <h2 className="pixel-font text-xl sm:text-2xl md:text-3xl text-white flex items-center gap-2">
-                        <History className="pixel-icon w-5 h-5 sm:w-6 sm:h-6" />
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
+                      <h2 className="pixel-font text-2xl sm:text-2xl md:text-3xl text-white flex items-center justify-center sm:justify-start gap-2">
+                        <History className="pixel-icon w-6 h-6 sm:w-6 sm:h-6" />
                         TRIP HISTORY
                       </h2>
                       <button
                         onClick={() => setShowTripModal(true)}
-                        className="px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2 self-center sm:self-auto"
                         style={{
                           background: !isLightMode ? 'rgba(255, 139, 106, 0.3)' : '#FFFFFF',
                           color: !isLightMode ? '#FFA07A' : '#FF8B6A',
@@ -2336,26 +2339,26 @@ const ShotgunAI = () => {
                   <div className="p-6 flex-1 overflow-hidden">
                     <div className="space-y-3 max-h-[500px] overflow-y-auto">
                       {trips.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 px-4">
-                          <div className="text-center mb-8">
-                            <p className={`pixel-font text-4xl mb-3 ${!isLightMode ? 'text-white' : ''}`} style={{
+                        <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
+                          <div className="text-center mb-6 sm:mb-8">
+                            <p className={`pixel-font text-3xl sm:text-4xl md:text-5xl mb-3 ${!isLightMode ? 'text-white' : ''}`} style={{
                               color: !isLightMode ? '#FFFFFF' : '#3D405B',
                               textShadow: !isLightMode ? '2px 2px 0px rgba(255, 139, 106, 0.3)' : '2px 2px 0px rgba(224, 122, 95, 0.2)'
                             }}>
                               NO TRIPS YET!
                             </p>
-                            <p className={`mono-font text-sm mb-2 ${!isLightMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <p className={`mono-font text-sm sm:text-base mb-2 ${!isLightMode ? 'text-gray-300' : 'text-gray-600'}`}>
                               Time to hit the road 🚗💨
                             </p>
-                            <p className={`mono-font text-xs ${!isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <p className={`mono-font text-xs sm:text-sm ${!isLightMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               Start tracking your carpools and earn points!
                             </p>
                           </div>
                           <button
                             onClick={() => setShowTripModal(true)}
-                            className="pixel-button button-pulse px-8 py-4 text-white pixel-font text-2xl rounded-lg flex items-center gap-3"
+                            className="pixel-button button-pulse px-6 sm:px-8 py-3 sm:py-4 text-white pixel-font text-lg sm:text-xl md:text-2xl rounded-lg flex items-center gap-2 sm:gap-3"
                           >
-                            <Plus size={28} className="pixel-icon" />
+                            <Plus size={24} className="pixel-icon sm:w-7 sm:h-7" />
                             LOG FIRST TRIP
                           </button>
                         </div>
@@ -2363,7 +2366,7 @@ const ShotgunAI = () => {
                         trips.map((trip, index) => (
                           <div
                             key={trip.id}
-                            className="p-4 rounded-lg group"
+                            className="p-3 sm:p-4 rounded-lg group"
                             style={{
                               background: !isLightMode ? 'rgba(30, 30, 30, 0.8)' : '#FFFFFF',
                               border: !isLightMode ? '2px solid #FF8B6A' : '4px solid #3D405B',
@@ -2371,42 +2374,51 @@ const ShotgunAI = () => {
                               animationDelay: `${index * 0.05}s`
                             }}
                           >
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-bold transition-colors" style={{
-                                    color: !isLightMode ? '#FFFFFF' : '#3D405B'
-                                  }}>{trip.driver}</span>
-                                  {trip.isDD && (
-                                    <span className="badge bg-purple-100 text-purple-700 border-purple-300 group-hover:scale-110 transition-transform">
-                                      🍺 DD
-                                    </span>
-                                  )}
-                                  {trip.isRoundTrip && (
-                                    <span className="badge bg-[#333] text-[#FF6B4A] border-[#FF8B6A] group-hover:scale-110 transition-transform">
-                                      🔄 Round Trip
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="text-xs mb-2" style={{
-                                  color: !isLightMode ? '#AAA' : '#666'
-                                }}>
-                                  <div className="flex items-center gap-1">
-                                    <MapPin size={12} className="pixel-icon" />
-                                    {trip.from}
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Navigation size={12} className="pixel-icon" />
-                                    {trip.to}
-                                  </div>
-                                </div>
-                                <div className="text-xs" style={{
-                                  color: !isLightMode ? '#888' : '#666'
-                                }}>
-                                  {trip.distance} mi • {trip.passengerCount} passenger{trip.passengerCount !== 1 ? 's' : ''} • +{(trip.driverPoints || trip.points || 0).toFixed(1)} pts (driver)
-                                </div>
+                            {/* Trip Header - Stack on mobile */}
+                            <div className="flex flex-wrap items-center gap-2 mb-3">
+                              <span className="font-bold text-base sm:text-sm" style={{
+                                color: !isLightMode ? '#FFFFFF' : '#3D405B'
+                              }}>{trip.driver}</span>
+                              {trip.isDD && (
+                                <span className="badge bg-purple-100 text-purple-700 border-purple-300 group-hover:scale-110 transition-transform text-xs">
+                                  🍺 DD
+                                </span>
+                              )}
+                              {trip.isRoundTrip && (
+                                <span className="badge bg-[#333] text-[#FF6B4A] border-[#FF8B6A] group-hover:scale-110 transition-transform text-xs">
+                                  🔄 Round Trip
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Route Info */}
+                            <div className="space-y-1 mb-3 text-xs" style={{
+                              color: !isLightMode ? '#AAA' : '#666'
+                            }}>
+                              <div className="flex items-center gap-1">
+                                <MapPin size={14} className="pixel-icon shrink-0" />
+                                <span className="truncate">{trip.from}</span>
                               </div>
                               <div className="flex items-center gap-1">
+                                <Navigation size={14} className="pixel-icon shrink-0" />
+                                <span className="truncate">{trip.to}</span>
+                              </div>
+                            </div>
+
+                            {/* Trip Stats - Stack on mobile */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                              <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs" style={{
+                                color: !isLightMode ? '#888' : '#666'
+                              }}>
+                                <span className="font-medium">{trip.distance} mi</span>
+                                <span>{trip.passengerCount} passenger{trip.passengerCount !== 1 ? 's' : ''}</span>
+                                <span className="font-bold" style={{
+                                  color: !isLightMode ? '#FFB088' : '#FF8B6A'
+                                }}>+{(trip.driverPoints || trip.points || 0).toFixed(1)} pts</span>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex items-center gap-1 self-start sm:self-auto">
                                 <button
                                   onClick={() => editTrip(trip)}
                                   className="p-2 text-[#FF8B6A] hover:bg-[#2a2a2a] rounded transition-all hover:scale-110 border-2 border-transparent hover:border-[#FF8B6A]"
@@ -2423,6 +2435,8 @@ const ShotgunAI = () => {
                                 </button>
                               </div>
                             </div>
+
+                            {/* Timestamp */}
                             <div className={`text-xs ${!isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
                               {new Date(trip.timestamp).toLocaleString()}
                             </div>
