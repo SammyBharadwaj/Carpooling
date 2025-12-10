@@ -69,54 +69,8 @@ const PixelBeer = ({ className = "" }) => (
   </svg>
 );
 
-// Custom Google Maps styling - Retro with Information
-const mapStyles = [
-  {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ color: '#2a2a2a' }, { lightness: 10 }]
-  },
-  {
-    featureType: 'landscape',
-    elementType: 'geometry',
-    stylers: [{ color: '#1a1a1a' }]
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [{ color: '#0a0a0a' }]
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#2a2a2a' }]
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#3a3a3a' }]
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#E07A5F' }]
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ color: '#3a3a3a' }]
-  },
-  {
-    featureType: 'all',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#3D405B' }, { saturation: -20 }]
-  },
-  {
-    featureType: 'all',
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#0a0a0a' }, { weight: 3 }]
-  }
-];
+// Use default Google Maps styling (normal colors)
+const mapStyles = [];
 
 const ShotgunAI = () => {
   // Auth
