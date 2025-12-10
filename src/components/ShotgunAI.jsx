@@ -302,10 +302,14 @@ const ShotgunAI = () => {
         } else {
           // Load most recent group or the one from localStorage
           const savedGroupId = localStorage.getItem('activeGroupId');
+          console.log('📋 Checking for saved group ID:', savedGroupId);
+          console.log('📋 Available groups:', userGroups.map(g => ({ id: g.id, name: g.name })));
+
           const groupToLoad = savedGroupId
             ? userGroups.find(g => g.id === savedGroupId) || userGroups[0]
             : userGroups[0];
 
+          console.log('✅ Loading group:', groupToLoad.name, '(ID:', groupToLoad.id, ')');
           setCurrentGroupId(groupToLoad.id);
           localStorage.setItem('activeGroupId', groupToLoad.id);
 
@@ -346,12 +350,16 @@ const ShotgunAI = () => {
     console.log('👂 Subscribing to group updates:', currentGroupId);
     const unsubscribe = groupService.subscribeToGroup(currentGroupId, (groupData) => {
       if (groupData) {
+        console.log('🔄 Real-time update received!', {
+          groupName: groupData.name,
+          membersCount: groupData.members?.length || 0,
+          tripsCount: groupData.trips?.length || 0
+        });
         setGroupName(groupData.name);
         setMembers(groupData.members || []);
         setTrips(groupData.trips || []);
         setDefaultCity(groupData.defaultCity || null);
         setAchievements(groupData.achievements || []);
-        console.log('🔄 Real-time update received');
       }
     });
 
@@ -363,7 +371,13 @@ const ShotgunAI = () => {
 
   // Save to Firestore whenever data changes
   useEffect(() => {
-    if (!currentGroupId || firestoreLoading) return;
+    if (!currentGroupId || firestoreLoading) {
+      console.log('⏭️ Skipping Firestore save - no groupId or still loading', {
+        currentGroupId,
+        firestoreLoading
+      });
+      return;
+    }
 
     // Skip saving on initial mount (empty data)
     if (members.length === 0 && trips.length === 0 && !defaultCity) {
@@ -373,13 +387,18 @@ const ShotgunAI = () => {
 
     const saveToFirestore = async () => {
       try {
+        console.log('💾 Saving to Firestore...', {
+          groupId: currentGroupId,
+          membersCount: members.length,
+          tripsCount: trips.length
+        });
         await groupService.updateGroup(currentGroupId, {
           members,
           trips,
           defaultCity,
           achievements
         });
-        console.log('💾 Saved to Firestore');
+        console.log('✅ Saved to Firestore successfully!');
       } catch (error) {
         console.error('❌ Error saving to Firestore:', error);
       }
@@ -858,13 +877,17 @@ const ShotgunAI = () => {
 
     if (editingTrip) {
       // Update existing trip
+      console.log('✏️ Updating trip:', newTrip.id);
       setTrips(trips.map(t => t.id === editingTrip.id ? newTrip : t));
     } else {
       // Add new trip
+      console.log('➕ Adding new trip:', newTrip);
       setTrips([newTrip, ...trips]);
     }
 
+    console.log('👥 Updating members with new stats');
     setMembers(updatedMembers);
+    console.log('🚀 Trip logged! Firestore save will trigger in 1 second...');
     resetTripForm();
   };
 
@@ -2111,15 +2134,25 @@ const ShotgunAI = () => {
             }}>
               {/* Header */}
               <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
-                <h1 className="pixel-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl glitch" data-text="SHOTGUN.AI" style={{
-                  letterSpacing: '0.1em',
-                  color: '#FF6B4A',
-                  textShadow: !isLightMode
-                    ? '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6)'
-                    : '2px 2px 0px rgba(224, 122, 95, 0.3)'
-                }}>
-                  SHOTGUN.AI
-                </h1>
+                <div>
+                  <h1 className="pixel-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl glitch" data-text="SHOTGUN.AI" style={{
+                    letterSpacing: '0.1em',
+                    color: '#FF6B4A',
+                    textShadow: !isLightMode
+                      ? '0 0 10px rgba(255, 107, 74, 0.8), 0 0 20px rgba(255, 107, 74, 0.6)'
+                      : '2px 2px 0px rgba(224, 122, 95, 0.3)'
+                  }}>
+                    SHOTGUN.AI
+                  </h1>
+                  {groupName && (
+                    <p className="mono-font text-xs sm:text-sm mt-1" style={{
+                      color: !isLightMode ? '#FF8B6A' : '#3D405B',
+                      opacity: 0.8
+                    }}>
+                      📍 Crew: <strong>{groupName}</strong>
+                    </p>
+                  )}
+                </div>
                 <div className="flex items-center gap-1 sm:gap-2">
                   {user && (
                     <div className="px-2 py-1 sm:px-3 sm:py-2" style={{
